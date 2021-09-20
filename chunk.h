@@ -27,6 +27,8 @@ typedef struct {
 int addConstant(Chunk* chunk, Value value);
 void freeChunk(Chunk* chunk);
 void initChunk(Chunk* chunk);
+Chunk* loadChunk(const char* path);
+void saveChunk(Chunk* chunk, const char* path);
 void writeChunk(Chunk* chunk, uint8_t byte, int line);
 
 #endif

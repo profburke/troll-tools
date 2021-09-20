@@ -5,9 +5,12 @@ TVMSRCS = chunk.c \
           value.c \
           vm.c
 
-TROLLCSRCS = compiler.c \
+TROLLCSRCS = chunk.c \
+             compiler.c \
+             memory.c \
              scanner.c \
-             trollc-main.c
+             trollc-main.c \
+             value.c
 
 tvm: ${TVMSRCS}
 	gcc -o tvm ${TVMSRCS}

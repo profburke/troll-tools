@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "chunk.h"
 #include "common.h"
@@ -35,13 +36,24 @@ static char* readFile(const char* path) {
   return buffer;
 }
 
-static void compileFile(const char* path) {
+static void compileFile(char* path) {
+  Chunk chunk;
+  initChunk(&chunk);
+  
   char* source = readFile(path);
-  InterpretResult result = runCompiler(source);
-  // TODO: write chunk to file...
-  free(source);
 
-  if (result == INTERPRET_COMPILE_ERROR) { exit(65); }
+  if (!compile(source, &chunk)) {
+    freeChunk(&chunk);
+    free(source);
+    exit(65);
+  }
+  // hack to change output file name; TODO: do this properly
+  int n = strlen(path);
+  path[n-1] = 'g';
+  saveChunk(&chunk, path);
+  
+  freeChunk(&chunk);
+  free(source);
 }
 
 int main(int argc, char* argv[]) {

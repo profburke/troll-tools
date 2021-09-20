@@ -3,7 +3,6 @@
 
 #include "vm.h"
 
-void compile(const char* source);
-InterpretResult runCompiler(const char* source);
+bool compile(const char* source, Chunk* chunk);
 
 #endif
