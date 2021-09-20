@@ -2,3 +2,5 @@
 *.o
 tvm
 trollc
+decom
+tvm-xcode
