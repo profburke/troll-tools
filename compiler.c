@@ -20,6 +20,7 @@ static void emitConstant(int value);
 static uint8_t makeConstant(int value);
 static void grouping();
 static void unary();
+static void dieroll();
 
 typedef struct {
   Token current;
@@ -32,7 +33,9 @@ typedef enum {
   PREC_NONE,
   PREC_TERM,
   PREC_FACTOR,
-  PREC_UNARY,
+  PREC_UNARY_MINUS,
+  PREC_MULTIDIE,
+  PREC_DIE,
   PREC_PRIMARY
 } Precedence;
 
@@ -164,12 +167,26 @@ static void grouping() {
 static void unary() {
   TokenType operatorType = parser.previous.type;
 
-  parsePrecedence(PREC_UNARY);
+  // TODO: correct precedence?
+  parsePrecedence(PREC_UNARY_MINUS);
 
   switch (operatorType) {
   case TOKEN_MINUS: emitByte(OP_NEGATE); break;
   default: return;
   }
+}
+
+static void dieroll() {
+    TokenType operatorType = parser.previous.type;
+
+    // TODO: correct precedence?
+    parsePrecedence(PREC_DIE);
+
+    switch (operatorType) {
+    case TOKEN_DIE: emitByte(OP_DIE); break;
+    case TOKEN_ZERO_DIE: emitByte(OP_ZERO_DIE); break;
+    default: return;
+    }
 }
 
 static void binary() {
@@ -208,8 +225,8 @@ static void parsePrecedence(Precedence precedence) {
 }
 
 ParseRule rules[] = {
-  [TOKEN_DIE]           = {NULL, NULL, PREC_NONE},
-  [TOKEN_ZERO_DIE]      = {NULL, NULL, PREC_NONE},
+  [TOKEN_DIE]           = {dieroll, NULL, PREC_DIE},
+  [TOKEN_ZERO_DIE]      = {dieroll, NULL, PREC_DIE},
   [TOKEN_UNION]         = {NULL, NULL, PREC_NONE},
   [TOKEN_PLUS]          = {NULL, binary, PREC_TERM},
   [TOKEN_TIMES]         = {NULL, binary, PREC_FACTOR},

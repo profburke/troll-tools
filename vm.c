@@ -73,12 +73,10 @@ static InterpretResult run() {
     case OP_DIE: {
       Value v = pop();
       int sides = v;
-      printf("sides %d\n", sides);
       // need to abstract this out so that we can easily include
       // different functions for different platforms (is arc4random available
       // on Arduino/ESP8266 ?
       Value value = arc4random_uniform(sides) + 1;
-      printf("value: %g\n", value);
       push(value);
       break;
     }
@@ -91,6 +89,14 @@ static InterpretResult run() {
       return INTERPRET_OK;
     }
     case OP_SUBTRACT: BINARY_OP(-); break;
+    case OP_ZERO_DIE: {
+      Value v = pop();
+      int sides = v;
+      // see block for OP_DIE
+      Value value = arc4random_uniform(sides);
+      push(value);
+      break;
+    }
     }
   }
 
