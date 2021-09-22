@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "memory.h"
+#include "object.h"
 #include "value.h"
 
 void freeValueArray(ValueArray* array) {
@@ -17,6 +18,7 @@ void initValueArray(ValueArray* array) {
 void printValue(Value value) {
   switch (value.type) {
   case VAL_INTEGER: printf("%d", AS_INTEGER(value)); break;
+  case VAL_OBJ: printObject(value); break;
   case VAL_REAL: printf("%g", AS_REAL(value)); break;
   }
 }

@@ -1,5 +1,6 @@
 TVMSRCS = chunk.c \
           debug.c \
+          object.c \
           vm-main.c \
           memory.c \
           value.c \
@@ -8,6 +9,7 @@ TVMSRCS = chunk.c \
 TROLLCSRCS = chunk.c \
              compiler.c \
              memory.c \
+             object.c \
              scanner.c \
              trollc-main.c \
              value.c
@@ -16,6 +18,7 @@ DECOMSRCS = chunk.c \
             debug.c \
             decom-main.c \
             memory.c \
+            object.c \
             value.c
 
 tvm: ${TVMSRCS}
@@ -28,5 +31,5 @@ decom: ${DECOMSRCS}
 	gcc -o decom ${DECOMSRCS}
 
 clean:
-	rm -rf *~ tvm
+	rm -rf *~ tvm trollc decom
 

@@ -22,6 +22,7 @@ static void grouping();
 static void unary();
 static void dieroll();
 static void question();
+static void string();
 
 typedef struct {
   Token current;
@@ -213,6 +214,11 @@ static void question() {
   emitByte(OP_QUESTION);
 }
 
+static void string() {
+  // TODO: pull embedded CONC operators out of string...
+  emitConstant(OBJ_VAL(copyString(parser.previous.start + 1, parser.previous.length - 2)));
+}
+
 static void expression() {
   parsePrecedence(PREC_TERM);
 }
@@ -274,7 +280,7 @@ ParseRule rules[] = {
   [TOKEN_INTEGER]       = {integer, NULL, PREC_NONE},
   [TOKEN_REAL]          = {NULL, NULL, PREC_NONE},
   [TOKEN_IDENTIFIER]    = {NULL, NULL, PREC_NONE},
-  [TOKEN_STRING]        = {NULL, NULL, PREC_NONE},
+  [TOKEN_STRING]        = {string, NULL, PREC_NONE},
   [TOKEN_SUM]           = {NULL, NULL, PREC_NONE},
   [TOKEN_SGN]           = {NULL, NULL, PREC_NONE},
   [TOKEN_MOD]           = {NULL, NULL, PREC_NONE},
