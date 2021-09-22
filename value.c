@@ -15,7 +15,7 @@ void initValueArray(ValueArray* array) {
 }
 
 void printValue(Value value) {
-  printf("%g", value);
+  printf("%d", AS_INTEGER(value));
 }
 
 void writeValueArray(ValueArray* array, Value value) {

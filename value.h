@@ -3,7 +3,27 @@
 
 #include "common.h"
 
-typedef double Value;
+typedef enum {
+  VAL_INTEGER,
+  VAL_REAL
+} ValueType;
+
+typedef struct {
+  ValueType type;
+  union {
+    int integer;
+    double real;
+  } as;
+} Value;
+
+#define IS_INTEGER(value) ((value).type == VAL_INTEGER)
+#define IS_REAL(value) ((value).type == VAL_REAL)
+
+#define AS_INTEGER(value) ((value).as.integer)
+#define AS_REAL(value) ((value).as.real)
+
+#define INTEGER_VAL(value) ((Value){VAL_INTEGER, {.integer = value}})
+#define REAL_VAL(value) ((Value){VAL_REAL, {.real = value}})
 
 typedef struct {
   int capacity;

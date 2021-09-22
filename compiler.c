@@ -16,8 +16,8 @@ static void emitReturn();
 static void emitBytes(uint8_t byte1, uint8_t byte2);
 static void expression();
 static void integer();
-static void emitConstant(int value);
-static uint8_t makeConstant(int value);
+static void emitConstant(Value value);
+static uint8_t makeConstant(Value value);
 static void grouping();
 static void unary();
 static void dieroll();
@@ -142,14 +142,14 @@ static void emitReturn() {
 
 static void integer() {
   int value = atoi(parser.previous.start);
-  emitConstant(value);
+  emitConstant(INTEGER_VAL(value));
 }
 
-static void emitConstant(int value) {
+static void emitConstant(Value value) {
   emitBytes(OP_CONSTANT, makeConstant(value));
 }
 
-static uint8_t makeConstant(int value) {
+static uint8_t makeConstant(Value value) {
   int constant = addConstant(currentChunk(), value);
   if (constant > UINT8_MAX) {
     error("Too many constants in one chunk.");
