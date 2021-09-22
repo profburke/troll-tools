@@ -15,7 +15,10 @@ void initValueArray(ValueArray* array) {
 }
 
 void printValue(Value value) {
-  printf("%d", AS_INTEGER(value));
+  switch (value.type) {
+  case VAL_INTEGER: printf("%d", AS_INTEGER(value)); break;
+  case VAL_REAL: printf("%g", AS_REAL(value)); break;
+  }
 }
 
 void writeValueArray(ValueArray* array, Value value) {

@@ -98,6 +98,19 @@ static InterpretResult run() {
       }
       push(INTEGER_VAL(-AS_INTEGER(pop())));
       break;
+    case OP_QUESTION:
+      if (!IS_REAL(peek(0))) {
+        runtimeError("Operand to '?' must be a real number in range (0, 1).");
+        return INTERPRET_RUNTIME_ERROR;
+      }
+      double p = AS_REAL(pop());
+      double v = (double)arc4random()/UINT32_MAX;
+      if (v < p) {
+        push(REAL_VAL(1));
+      } else {
+        push(REAL_VAL(0)); // TODO: need to push an empty collection
+      }
+      break;
     case OP_RETURN: {
       printValue(pop());
       printf("\n");

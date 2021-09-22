@@ -21,6 +21,7 @@ static uint8_t makeConstant(Value value);
 static void grouping();
 static void unary();
 static void dieroll();
+static void question();
 
 typedef struct {
   Token current;
@@ -203,6 +204,15 @@ static void binary() {
   }
 }
 
+static void question() {
+  // already consumed the '?'
+  consume(TOKEN_REAL, "Expect number in range (0, 1.0) after '?'.");
+  double value = strtod(parser.previous.start, NULL);
+  // TODO: check that 0 < value < 1
+  emitConstant(REAL_VAL(value));
+  emitByte(OP_QUESTION);
+}
+
 static void expression() {
   parsePrecedence(PREC_TERM);
 }
@@ -241,7 +251,7 @@ ParseRule rules[] = {
   [TOKEN_BANG]          = {NULL, NULL, PREC_NONE},
   [TOKEN_AND]           = {NULL, NULL, PREC_NONE},
   [TOKEN_HASH]          = {NULL, NULL, PREC_NONE},
-  [TOKEN_QUESTION]      = {NULL, NULL, PREC_NONE},
+  [TOKEN_QUESTION]      = {question, NULL, PREC_NONE}, // TODO: we don't really need precedence, do we?
   [TOKEN_SAMPLE]        = {NULL, NULL, PREC_NONE},
   [TOKEN_LBRACK]        = {NULL, NULL, PREC_NONE},
   [TOKEN_RBRACK]        = {NULL, NULL, PREC_NONE},
