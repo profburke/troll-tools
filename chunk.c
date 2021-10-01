@@ -3,6 +3,7 @@
 
 #include "chunk.h"
 #include "memory.h"
+#include "object.h"
 
 int addConstant(Chunk* chunk, Value value) {
   writeValueArray(&chunk->constants, value);
@@ -94,6 +95,27 @@ void saveChunk(Chunk* chunk, const char* path) {
     fprintf(stderr, "Could not write chunk constants to file '%s'.\n", path);
     fclose(file);
     exit(74);
+  }
+
+  // count # of strings and write it
+  int nstrings = 0;
+  for (int i = 0; i < chunk->constants.count; i++) {
+    if (IS_STRING(chunk->constants.values[i])) {
+      nstrings++;
+    }
+  }
+  fwrite(&nstrings, sizeof(int), 1, file);
+
+  // for each string, write the constant #, the string length (w/out trailing new line)
+  // and then the string
+  for (int i = 0; i < chunk->constants.count; i++) {
+    if (IS_STRING(chunk->constants.values[i])) {
+      ObjString *s = AS_STRING(chunk->constants.values[i]);
+      int l = s->length;
+      fwrite(&i, sizeof(int), 1, file);
+      fwrite(&l, sizeof(int), 1, file);
+      fwrite(s->chars, sizeof(char), l, file);
+    }
   }
   
   fclose(file);
