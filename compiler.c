@@ -33,6 +33,7 @@ typedef struct {
 
 typedef enum {
   PREC_NONE,
+  PREC_CONCAT,
   PREC_TERM,
   PREC_FACTOR,
   PREC_UNARY_MINUS,
@@ -202,6 +203,10 @@ static void binary() {
   case TOKEN_MOD: emitByte(OP_MOD); break;
   case TOKEN_TIMES: emitByte(OP_MULTIPLY); break;
   case TOKEN_DIVIDE: emitByte(OP_DIVIDE); break;
+  case TOKEN_HCONC: emitByte(OP_HCONC); break;
+  case TOKEN_VCONCL: emitByte(OP_VCONCL); break;
+  case TOKEN_VCONCR: emitByte(OP_VCONCR); break;
+  case TOKEN_VCONCC: emitByte(OP_VCONCC); break;
   default: return;
   }
 }
@@ -221,7 +226,7 @@ static void string() {
 }
 
 static void expression() {
-  parsePrecedence(PREC_TERM);
+  parsePrecedence(PREC_CONCAT);
 }
 
 static void parsePrecedence(Precedence precedence) {
@@ -272,10 +277,10 @@ ParseRule rules[] = {
   [TOKEN_LE]            = {NULL, NULL, PREC_NONE},
   [TOKEN_GE]            = {NULL, NULL, PREC_NONE},
   [TOKEN_DOT_DOT]       = {NULL, NULL, PREC_NONE},
-  [TOKEN_HCONC]         = {NULL, NULL, PREC_NONE},
-  [TOKEN_VCONCL]        = {NULL, NULL, PREC_NONE},
-  [TOKEN_VCONCR]        = {NULL, NULL, PREC_NONE},
-  [TOKEN_VCONCC]        = {NULL, NULL, PREC_NONE},
+  [TOKEN_HCONC]         = {NULL, binary, PREC_CONCAT},
+  [TOKEN_VCONCL]        = {NULL, binary, PREC_CONCAT},
+  [TOKEN_VCONCR]        = {NULL, binary, PREC_CONCAT},
+  [TOKEN_VCONCC]        = {NULL, binary, PREC_CONCAT},
   [TOKEN_FIRST]         = {NULL, NULL, PREC_NONE},
   [TOKEN_SECOND]        = {NULL, NULL, PREC_NONE},
   [TOKEN_INTEGER]       = {integer, NULL, PREC_NONE},

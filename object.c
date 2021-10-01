@@ -35,4 +35,8 @@ void printObject(Value value) {
   }
 }
 
+ObjString* takeString(char* chars, int length) {
+  return allocateString(chars, length);
+}
+
     

@@ -9,12 +9,16 @@ typedef enum {
   OP_DIE,
   OP_DIVIDE,
   OP_CONSTANT,
+  OP_HCONC,
   OP_MOD,
   OP_MULTIPLY,
   OP_NEGATE,
   OP_QUESTION,
   OP_RETURN,
   OP_SUBTRACT,
+  OP_VCONCC,
+  OP_VCONCL,
+  OP_VCONCR,
   OP_ZERO_DIE
 } OpCode;
 

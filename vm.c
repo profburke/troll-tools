@@ -1,9 +1,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "common.h"
 #include "debug.h"
+#include "memory.h"
+#include "object.h"
 #include "vm.h"
 
 static Value peek(int distance);
@@ -55,6 +58,23 @@ static InterpretResult run() {
     int a = AS_INTEGER(pop()); \
     push(valueType(a op b)); \
   } while(false)
+// TODO: ugh...actually implementing these are going to be fun...
+#define BINARY_STRING_OP(op) \
+  do { \
+    if (!IS_STRING(peek(0)) || !IS_STRING(peek(1))) { \
+      runtimeError("Operands to concat operator must be string."); \
+      return INTERPRET_RUNTIME_ERROR; \
+    } \
+    ObjString* a = AS_STRING(pop()); \
+    ObjString* b = AS_STRING(pop()); \
+    int length = a->length + b->length; \
+    char* chars = ALLOCATE(char, length + 1); \
+    memcpy(chars, a->chars, a->length); \
+    memcpy(chars + a->length, b->chars, b->length); \
+    chars[length] = '\0'; \
+    ObjString* c = takeString(chars, length); \
+    push(OBJ_VAL(c)); \
+  } while(false)
   
   for (;;) {
 #ifdef DEBUG_TRACE_EXECUTION
@@ -90,6 +110,7 @@ static InterpretResult run() {
       break;
     }
     case OP_DIVIDE: BINARY_OP(INTEGER_VAL, /); break;
+    case OP_HCONC: BINARY_STRING_OP("h"); break;
     case OP_MOD: BINARY_OP(INTEGER_VAL, %); break;
     case OP_MULTIPLY: BINARY_OP(INTEGER_VAL, *); break;
     case OP_NEGATE:
@@ -118,6 +139,9 @@ static InterpretResult run() {
       return INTERPRET_OK;
     }
     case OP_SUBTRACT: BINARY_OP(INTEGER_VAL, -); break;
+    case OP_VCONCC: BINARY_STRING_OP("cc"); break;
+    case OP_VCONCL: BINARY_STRING_OP("cl"); break;
+    case OP_VCONCR: BINARY_STRING_OP("cr"); break;
     case OP_ZERO_DIE: {
       if (!IS_INTEGER(peek(0))) {
         runtimeError("Expression for die sides must be an integer.");
