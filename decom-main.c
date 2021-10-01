@@ -6,7 +6,7 @@
 
 void decom(const char* path) {
   Chunk* chunk = loadChunk(path);
-  disassembleChunk(chunk, "come up with something");
+  disassembleChunk(chunk, path);
 }
 
 int main(int argc, char* argv[]) {
