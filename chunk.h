@@ -9,6 +9,7 @@ typedef enum {
   OP_DIE,
   OP_DIVIDE,
   OP_CONSTANT,
+  OP_MOD,
   OP_MULTIPLY,
   OP_NEGATE,
   OP_QUESTION,

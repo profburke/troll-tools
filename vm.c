@@ -90,6 +90,7 @@ static InterpretResult run() {
       break;
     }
     case OP_DIVIDE: BINARY_OP(INTEGER_VAL, /); break;
+    case OP_MOD: BINARY_OP(INTEGER_VAL, %); break;
     case OP_MULTIPLY: BINARY_OP(INTEGER_VAL, *); break;
     case OP_NEGATE:
       if (!IS_INTEGER(peek(0))) {

@@ -199,6 +199,7 @@ static void binary() {
   switch (operatorType) {
   case TOKEN_PLUS: emitByte(OP_ADD); break;
   case TOKEN_MINUS: emitByte(OP_SUBTRACT); break;
+  case TOKEN_MOD: emitByte(OP_MOD); break;
   case TOKEN_TIMES: emitByte(OP_MULTIPLY); break;
   case TOKEN_DIVIDE: emitByte(OP_DIVIDE); break;
   default: return;
@@ -283,7 +284,7 @@ ParseRule rules[] = {
   [TOKEN_STRING]        = {string, NULL, PREC_NONE},
   [TOKEN_SUM]           = {NULL, NULL, PREC_NONE},
   [TOKEN_SGN]           = {NULL, NULL, PREC_NONE},
-  [TOKEN_MOD]           = {NULL, NULL, PREC_NONE},
+  [TOKEN_MOD]           = {NULL, binary, PREC_FACTOR},
   [TOKEN_LEAST]         = {NULL, NULL, PREC_NONE},
   [TOKEN_LARGEST]       = {NULL, NULL, PREC_NONE},
   [TOKEN_COUNT]         = {NULL, NULL, PREC_NONE},
