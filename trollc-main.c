@@ -48,7 +48,7 @@ static void compileFile(char* path) {
     exit(65);
   }
   // hack to change output file name; TODO: do this properly
-  int n = strlen(path);
+  size_t n = strlen(path);
   path[n-1] = 'g';
   saveChunk(&chunk, path);
   

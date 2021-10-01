@@ -88,7 +88,7 @@ void saveChunk(Chunk* chunk, const char* path) {
   fwrite(&chunk->count, sizeof(int), 1, file);
   fwrite(&chunk->constants.count, sizeof(int), 1, file);
   
-  int nWritten = fwrite(chunk->code, sizeof(uint8_t), chunk->count, file);
+  size_t nWritten = fwrite(chunk->code, sizeof(uint8_t), chunk->count, file);
   if (nWritten != chunk->count) {
     fprintf(stderr, "Could not write bytecodes to file '%s'.\n", path);
     fclose(file);

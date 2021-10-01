@@ -5,24 +5,24 @@
 #include "compiler.h"
 #include "scanner.h"
 
-static void advance();
+static void advance(void);
 static void errorAt(Token* token, const char* message);
 static void error(const char* message);
 static void errorAtCurrent(const char* message);
 static void consume(TokenType type, const char* message);
 static void emitByte(uint8_t byte);
-static void endCompiler();
-static void emitReturn();
+static void endCompiler(void);
+static void emitReturn(void);
 static void emitBytes(uint8_t byte1, uint8_t byte2);
-static void expression();
-static void integer();
+static void expression(void);
+static void integer(void);
 static void emitConstant(Value value);
 static uint8_t makeConstant(Value value);
-static void grouping();
-static void unary();
-static void dieroll();
-static void question();
-static void string();
+static void grouping(void);
+static void unary(void);
+static void dieroll(void);
+static void question(void);
+static void string(void);
 
 typedef struct {
   Token current;
@@ -41,7 +41,7 @@ typedef enum {
   PREC_PRIMARY
 } Precedence;
 
-typedef void (*ParseFn)();
+typedef void (*ParseFn)(void);
 
 typedef struct {
   ParseFn prefix;

@@ -4,22 +4,22 @@
 #include "common.h"
 #include "scanner.h"
 
-static bool isAtEnd();
+static bool isAtEnd(void);
 static Token makeToken(TokenType type);
 static Token errorToken(const char* message);
-static char advance();
+static char advance(void);
 static bool match(char expected);
-static void skipWhitespace();
-static char peek();
-static char peekNext();
-static Token string();
+static void skipWhitespace(void);
+static char peek(void);
+static char peekNext(void);
+static Token string(void);
 static bool isDigit(char c);
 static bool isNonzeroDigit(char c);
 static bool isAlpha(char c);
-static Token realOrZero();
-static Token integer();
-static Token identifier();
-static TokenType identifierType();
+static Token realOrZero(void);
+static Token integer(void);
+static Token identifier(void);
+static TokenType identifierType(void);
 static TokenType checkKeyword(int start, int length, const char* rest, TokenType type);
 
 typedef struct {
@@ -36,7 +36,7 @@ void initScanner(const char* source) {
   scanner.line = 1;
 }
 
-Token scanToken() {
+Token scanToken(void) {
   skipWhitespace();
   scanner.start = scanner.current;
 
