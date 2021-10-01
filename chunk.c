@@ -54,11 +54,24 @@ Chunk* loadChunk(const char* path) {
   fread(chunk->lines, sizeof(int), nOps, file);
   
   // now read in constants
-  //  fread(chunk->constants.values, sizeof(Value), nConstants, file);
   Value value;
   for (int i = 0; i < nConstants; i++) {
     fread(&value, sizeof(Value), 1, file);
     addConstant(chunk, value);
+  }
+
+  // now read in strings
+  char buffer[255];
+  int nstrings = 0;
+  fread(&nstrings, sizeof(int), 1, file);
+  for (int i = 0; i < nstrings; i++) {
+    int constantIndex = 0;
+    int length = 0;
+    fread(&constantIndex, sizeof(int), 1, file);
+    fread(&length, sizeof(int), 1, file); // TODO: make sure string isn't too long...
+    fread(buffer, sizeof(char), length, file);
+    ObjString* s = copyString(buffer, length);
+    chunk->constants.values[constantIndex] = OBJ_VAL(s);
   }
   
   fclose(file);
