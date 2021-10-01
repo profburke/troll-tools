@@ -21,6 +21,8 @@ DECOMSRCS = chunk.c \
             object.c \
             value.c
 
+all: tvm trollc decom
+
 tvm: ${TVMSRCS}
 	gcc -o tvm ${TVMSRCS}
 
