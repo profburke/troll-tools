@@ -4,6 +4,7 @@
 #include "common.h"
 
 typedef struct Obj Obj;
+typedef struct ObjPair ObjPair;
 typedef struct ObjString ObjString;
 
 typedef enum {

@@ -110,17 +110,34 @@ static InterpretResult run() {
       break;
     }
     case OP_DIVIDE: BINARY_OP(INTEGER_VAL, /); break;
+    case OP_FIRST: {
+      if (!IS_PAIR(peek(0))) {
+        runtimeError("Operand must be a pair.");
+        return INTERPRET_RUNTIME_ERROR;
+      }
+      ObjPair* p = AS_PAIR(pop());
+      push(p->a);
+    }
+      break;
     case OP_HCONC: BINARY_STRING_OP("h"); break;
+    case OP_MKPAIR: {
+      Value b = pop();
+      Value a = pop();
+      ObjPair* p = makePair(a, b);
+      push(OBJ_VAL(p));
+    }
+      break;
     case OP_MOD: BINARY_OP(INTEGER_VAL, %); break;
     case OP_MULTIPLY: BINARY_OP(INTEGER_VAL, *); break;
-    case OP_NEGATE:
+    case OP_NEGATE: {
       if (!IS_INTEGER(peek(0))) {
         runtimeError("Operand to unary minus must be an integer.");
         return INTERPRET_RUNTIME_ERROR;
       }
       push(INTEGER_VAL(-AS_INTEGER(pop())));
+    }
       break;
-    case OP_QUESTION:
+    case OP_QUESTION: {
       if (!IS_REAL(peek(0))) {
         runtimeError("Operand to '?' must be a real number in range (0, 1).");
         return INTERPRET_RUNTIME_ERROR;
@@ -132,12 +149,22 @@ static InterpretResult run() {
       } else {
         push(REAL_VAL(0)); // TODO: need to push an empty collection
       }
+    }
       break;
     case OP_RETURN: {
       printValue(pop());
       printf("\n");
       return INTERPRET_OK;
     }
+    case OP_SECOND: {
+      if (!IS_PAIR(peek(0))) {
+        runtimeError("Operand must be a pair.");
+        return INTERPRET_RUNTIME_ERROR;
+      }
+      ObjPair* p = AS_PAIR(pop());
+      push(p->b);
+    }
+      break;
     case OP_SUBTRACT: BINARY_OP(INTEGER_VAL, -); break;
     case OP_VCONCC: BINARY_STRING_OP("cc"); break;
     case OP_VCONCL: BINARY_STRING_OP("cl"); break;

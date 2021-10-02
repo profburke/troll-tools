@@ -29,8 +29,24 @@ ObjString* copyString(const char* chars, int length) {
   return allocateString(heapChars, length);
 }
 
+ObjPair* makePair(Value a, Value b) {
+  ObjPair* pair = ALLOCATE_OBJ(ObjPair, OBJ_PAIR);
+  pair->a = a;
+  pair->b = b;
+  return pair;
+}
+
 void printObject(Value value) {
   switch (OBJ_TYPE(value)) {
+  case OBJ_PAIR: {
+    ObjPair* p = AS_PAIR(value);
+    printf("[");
+    printValue(p->a);
+    printf(", ");
+    printValue(p->b);
+    printf("]");
+  }
+    break;
   case OBJ_STRING: printf("%s", AS_CSTRING(value)); break;
   }
 }

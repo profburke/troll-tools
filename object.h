@@ -6,17 +6,26 @@
 
 #define OBJ_TYPE(value) (AS_OBJ(value)->type)
 
+#define IS_PAIR(value) isObjType(value, OBJ_PAIR)
 #define IS_STRING(value) isObjType(value, OBJ_STRING)
 
+#define AS_PAIR(value) ((ObjPair*)AS_OBJ(value))
 #define AS_STRING(value) ((ObjString*)AS_OBJ(value))
 #define AS_CSTRING(value) (((ObjString*)AS_OBJ(value))->chars)
 
 typedef enum {
+  OBJ_PAIR,
   OBJ_STRING
 } ObjType;
 
 struct Obj {
   ObjType type;
+};
+
+struct ObjPair {
+  Obj obj;
+  Value a;
+  Value b;
 };
 
 struct ObjString {
@@ -26,6 +35,7 @@ struct ObjString {
 };
 
 ObjString* copyString(const char* chars, int length);
+ObjPair* makePair(Value a, Value b);
 void printObject(Value value);
 ObjString* takeString(char* chars, int length);
 

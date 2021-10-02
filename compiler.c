@@ -23,6 +23,8 @@ static void unary(void);
 static void dieroll(void);
 static void question(void);
 static void string(void);
+static void pair(void);
+static void pairSelector(void);
 
 typedef struct {
   Token current;
@@ -37,6 +39,7 @@ typedef enum {
   PREC_TERM,
   PREC_FACTOR,
   PREC_UNARY_MINUS,
+  PREC_AGGREGATE, // choose, count, sum, ..., %1, %2
   PREC_MULTIDIE,
   PREC_DIE,
   PREC_PRIMARY
@@ -220,6 +223,26 @@ static void question() {
   emitByte(OP_QUESTION);
 }
 
+static void pair() {
+  expression();
+  consume(TOKEN_COMMA, "Pair expressions must be separated by ','.");
+  expression();
+  consume(TOKEN_RBRACK, "Pair must be closed with a ']'.");
+  emitByte(OP_MKPAIR);
+}
+
+static void pairSelector() {
+  TokenType operatorType = parser.previous.type;
+
+  parsePrecedence(PREC_AGGREGATE); // TODO: I don't think this is correct
+
+  switch (operatorType) {
+  case TOKEN_FIRST: emitByte(OP_FIRST); break;
+  case TOKEN_SECOND: emitByte(OP_SECOND); break;
+  default: return;
+  }
+}
+
 static void string() {
   // TODO: pull embedded CONC operators out of string...
   emitConstant(OBJ_VAL(copyString(parser.previous.start + 1, parser.previous.length - 2)));
@@ -265,7 +288,7 @@ ParseRule rules[] = {
   [TOKEN_HASH]          = {NULL, NULL, PREC_NONE},
   [TOKEN_QUESTION]      = {question, NULL, PREC_NONE}, // TODO: we don't really need precedence, do we?
   [TOKEN_SAMPLE]        = {NULL, NULL, PREC_NONE},
-  [TOKEN_LBRACK]        = {NULL, NULL, PREC_NONE},
+  [TOKEN_LBRACK]        = {pair, NULL, PREC_NONE},
   [TOKEN_RBRACK]        = {NULL, NULL, PREC_NONE},
   [TOKEN_MINUS]         = {unary, binary, PREC_TERM},
   [TOKEN_SET_MINUS]     = {NULL, NULL, PREC_NONE},
@@ -281,8 +304,8 @@ ParseRule rules[] = {
   [TOKEN_VCONCL]        = {NULL, binary, PREC_CONCAT},
   [TOKEN_VCONCR]        = {NULL, binary, PREC_CONCAT},
   [TOKEN_VCONCC]        = {NULL, binary, PREC_CONCAT},
-  [TOKEN_FIRST]         = {NULL, NULL, PREC_NONE},
-  [TOKEN_SECOND]        = {NULL, NULL, PREC_NONE},
+  [TOKEN_FIRST]         = {pairSelector, NULL, PREC_NONE},
+  [TOKEN_SECOND]        = {pairSelector, NULL, PREC_NONE},
   [TOKEN_INTEGER]       = {integer, NULL, PREC_NONE},
   [TOKEN_REAL]          = {NULL, NULL, PREC_NONE},
   [TOKEN_IDENTIFIER]    = {NULL, NULL, PREC_NONE},

@@ -42,8 +42,12 @@ int disassembleInstruction(Chunk* chunk, int offset) {
     return simpleInstruction("OP_DIE", offset);
   case OP_DIVIDE:
     return simpleInstruction("OP_DIVIDE", offset);
+  case OP_FIRST:
+    return simpleInstruction("OP_FIRST", offset);
   case OP_HCONC:
     return simpleInstruction("OP_HCONC", offset);
+  case OP_MKPAIR:
+    return simpleInstruction("OP_MKPAIR", offset);
   case OP_MOD:
     return simpleInstruction("OP_MOD", offset);
   case OP_MULTIPLY:
@@ -54,6 +58,8 @@ int disassembleInstruction(Chunk* chunk, int offset) {
     return simpleInstruction("OP_QUESTION", offset);
   case OP_RETURN:
     return simpleInstruction("OP_RETURN", offset);
+  case OP_SECOND:
+    return simpleInstruction("OP_SECOND", offset);
   case OP_SUBTRACT:
     return simpleInstruction("OP_SUBTRACT", offset);
   case OP_VCONCC:
