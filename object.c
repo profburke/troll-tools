@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "memory.h"
@@ -55,19 +56,29 @@ ObjPair* makePair(Value a, Value b) {
   return pair;
 }
 
+static int comp(const void* e1, const void* e2) {
+  int f = *((int*)e1);
+  int s = *((int*)e2);
+
+  if (f > s) { return 1; }
+  if (f < s) { return -1; }
+  return 0;
+}
+
+// Note: qsort is recursive; if this turns out to be a problem
+// consider switching to heapsort (which does require nel*sizeof(el) additional
+// space).
 void printObject(Value value) {
   switch (OBJ_TYPE(value)) {
   case OBJ_COLLECTION: {
-    // TODO: collection values should display sorted
     ObjCollection* c = AS_COLLECTION(value);
-    printf("{");
+    qsort(c->ints, c->count, sizeof(int), comp);
     for (int i = 0; i < c->count; i++) {
       printf("%d", c->ints[i]);
       if (i != c->count - 1) {
         printf(", ");
       }
     }
-    printf("}");
   }
     break;
   case OBJ_PAIR: {
