@@ -11,6 +11,12 @@ void disassembleChunk(Chunk* chunk, const char* name) {
   }
 }
 
+static int byteInstruction(const char* name, Chunk* chunk, int offset) {
+  uint8_t n = chunk->code[offset + 1];
+  printf("%-16s %4d\n", name, n);
+  return offset + 2;
+}
+
 static int constantInstruction(const char* name, Chunk* chunk, int offset) {
   uint8_t constant = chunk->code[offset + 1];
   printf("%-16s %4d '", name, constant);
@@ -36,6 +42,8 @@ int disassembleInstruction(Chunk* chunk, int offset) {
   switch (instruction) {
   case OP_ADD:
     return simpleInstruction("OP_ADD", offset);
+  case OP_ADD2CLLCTN:
+    return byteInstruction("OP_ADD2CLLCTN", chunk, offset);
   case OP_CONSTANT:
     return constantInstruction("OP_CONSTANT", chunk, offset);
   case OP_DIE:
@@ -46,6 +54,8 @@ int disassembleInstruction(Chunk* chunk, int offset) {
     return simpleInstruction("OP_FIRST", offset);
   case OP_HCONC:
     return simpleInstruction("OP_HCONC", offset);
+  case OP_MKCOLLECTION:
+    return simpleInstruction("OP_MKCOLLECTION", offset);
   case OP_MKPAIR:
     return simpleInstruction("OP_MKPAIR", offset);
   case OP_MOD:

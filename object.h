@@ -6,20 +6,30 @@
 
 #define OBJ_TYPE(value) (AS_OBJ(value)->type)
 
+#define IS_COLLECTION(value) isObjType(value, OBJ_COLLECTION)
 #define IS_PAIR(value) isObjType(value, OBJ_PAIR)
 #define IS_STRING(value) isObjType(value, OBJ_STRING)
 
+#define AS_COLLECTION(value) ((ObjCollection*)AS_OBJ(value))
 #define AS_PAIR(value) ((ObjPair*)AS_OBJ(value))
 #define AS_STRING(value) ((ObjString*)AS_OBJ(value))
 #define AS_CSTRING(value) (((ObjString*)AS_OBJ(value))->chars)
 
 typedef enum {
+  OBJ_COLLECTION,
   OBJ_PAIR,
   OBJ_STRING
 } ObjType;
 
 struct Obj {
   ObjType type;
+};
+
+struct ObjCollection {
+  Obj obj;
+  int count;
+  int capacity;
+  int* ints;
 };
 
 struct ObjPair {
@@ -34,7 +44,9 @@ struct ObjString {
   char* chars;
 };
 
+void addToCollection(ObjCollection* c, int n);
 ObjString* copyString(const char* chars, int length);
+ObjCollection* makeCollection(); // TODO: rename makeX to initX
 ObjPair* makePair(Value a, Value b);
 void printObject(Value value);
 ObjString* takeString(char* chars, int length);

@@ -92,6 +92,17 @@ static InterpretResult run() {
     uint8_t instruction;
     switch (instruction = READ_BYTE()) {
     case OP_ADD: BINARY_OP(INTEGER_VAL, +); break;
+    case OP_ADD2CLLCTN: {
+      // TODO: error check TOS is a collection
+      ObjCollection* c = AS_COLLECTION(pop());
+      uint8_t n = READ_BYTE();
+      for (int i = 0; i < n; i++) {
+        // TODO: error check TOS is an int
+        addToCollection(c, AS_INTEGER(pop()));
+      }
+      push(OBJ_VAL(c));
+    }
+      break;
     case OP_CONSTANT: {
       Value constant = READ_CONSTANT();
       push(constant);
@@ -103,7 +114,7 @@ static InterpretResult run() {
         return INTERPRET_RUNTIME_ERROR;
       }
       int sides = AS_INTEGER(pop());
-      // need to abstract this out so that we can easily include
+      // TODO: need to abstract this out so that we can easily include
       // different functions for different platforms (is arc4random available
       // on Arduino/ESP8266 ?
       push(INTEGER_VAL(arc4random_uniform(sides) + 1));
@@ -120,6 +131,11 @@ static InterpretResult run() {
     }
       break;
     case OP_HCONC: BINARY_STRING_OP("h"); break;
+    case OP_MKCOLLECTION: {
+      ObjCollection* c = makeCollection();
+      push(OBJ_VAL(c));
+    }
+      break;
     case OP_MKPAIR: {
       Value b = pop();
       Value a = pop();
@@ -145,9 +161,10 @@ static InterpretResult run() {
       double p = AS_REAL(pop());
       double v = (double)arc4random()/UINT32_MAX;
       if (v < p) {
-        push(REAL_VAL(1));
+        push(INTEGER_VAL(1));
       } else {
-        push(REAL_VAL(0)); // TODO: need to push an empty collection
+        ObjCollection* c = makeCollection();
+        push(OBJ_VAL(c));
       }
     }
       break;
