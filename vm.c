@@ -8,6 +8,7 @@
 #include "memory.h"
 #include "object.h"
 #include "vm.h"
+#include "vm-macros.h"
 
 static Value peek(int distance);
 static Value pop();
@@ -46,37 +47,8 @@ static void resetStack() {
 }
 
 static InterpretResult run() {
-#define READ_BYTE() (*vm.ip++)
-#define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
-#define BINARY_OP(valueType, op) \
-  do { \
-    if (!IS_INTEGER(peek(0)) || !IS_INTEGER(peek(1))) { \
-      runtimeError("Operands to binary operator must be integers."); \
-      return INTERPRET_RUNTIME_ERROR; \
-    } \
-    int b = AS_INTEGER(pop()); \
-    int a = AS_INTEGER(pop()); \
-    push(valueType(a op b)); \
-  } while(false)
-// TODO: ugh...actually implementing these are going to be fun...
-#define BINARY_STRING_OP(op) \
-  do { \
-    if (!IS_STRING(peek(0)) || !IS_STRING(peek(1))) { \
-      runtimeError("Operands to concat operator must be string."); \
-      return INTERPRET_RUNTIME_ERROR; \
-    } \
-    ObjString* a = AS_STRING(pop()); \
-    ObjString* b = AS_STRING(pop()); \
-    int length = a->length + b->length; \
-    char* chars = ALLOCATE(char, length + 1); \
-    memcpy(chars, a->chars, a->length); \
-    memcpy(chars + a->length, b->chars, b->length); \
-    chars[length] = '\0'; \
-    ObjString* c = takeString(chars, length); \
-    push(OBJ_VAL(c)); \
-  } while(false)
-  
   for (;;) {
+
 #ifdef DEBUG_TRACE_EXECUTION
     printf("          ");
     for (Value* slot = vm.stack; slot < vm.stackTop; slot++) {
@@ -91,28 +63,27 @@ static InterpretResult run() {
     
     uint8_t instruction;
     switch (instruction = READ_BYTE()) {
-    case OP_ADD: BINARY_OP(INTEGER_VAL, +); break;
+    case OP_ADD:
+      BINARY_OP(INTEGER_VAL, +);
+      break;
     case OP_ADD2CLLCTN: {
-      // TODO: error check TOS is a collection
+      CHECK_COLLECTION(0, "Must have a collection to add to.");
       ObjCollection* c = AS_COLLECTION(pop());
       uint8_t n = READ_BYTE();
       for (int i = 0; i < n; i++) {
-        // TODO: error check TOS is an int
+        CHECK_INTEGER(0, "Can only add integers to a collection.");
         addToCollection(c, AS_INTEGER(pop()));
       }
       push(OBJ_VAL(c));
-    }
       break;
+    }
     case OP_CONSTANT: {
       Value constant = READ_CONSTANT();
       push(constant);
       break;
     }
     case OP_DIE: {
-      if (!IS_INTEGER(peek(0))) {
-        runtimeError("Expression for die sides must be an integer.");
-        return INTERPRET_RUNTIME_ERROR;
-      }
+      CHECK_POSITIVE_INTEGER(0, "Expression for die sides must be a positive integer.");
       int sides = AS_INTEGER(pop());
       // TODO: need to abstract this out so that we can easily include
       // different functions for different platforms (is arc4random available
@@ -120,28 +91,21 @@ static InterpretResult run() {
       push(INTEGER_VAL(arc4random_uniform(sides) + 1));
       break;
     }
-    case OP_DIVIDE: BINARY_OP(INTEGER_VAL, /); break;
+    case OP_DIVIDE:
+      BINARY_OP(INTEGER_VAL, /);
+      break;
     case OP_FIRST: {
-      if (!IS_PAIR(peek(0))) {
-        runtimeError("Operand must be a pair.");
-        return INTERPRET_RUNTIME_ERROR;
-      }
+      CHECK_PAIR(0, "Operand must be a pair.");
       ObjPair* p = AS_PAIR(pop());
       push(p->a);
-    }
       break;
-    case OP_HCONC: BINARY_STRING_OP("h"); break;
+    }
+    case OP_HCONC:
+      BINARY_STRING_OP("h");
+      break;
     case OP_MDIE: {
-      if (!IS_INTEGER(peek(0))) {
-        // TODO: must be > 0
-        runtimeError("Expression for die sides must be an integer.");
-        return INTERPRET_RUNTIME_ERROR;
-      }
-      if (!IS_INTEGER(peek(1))) {
-        // TODO: must be > 0
-        runtimeError("Expression for number of die must be an integer.");
-        return INTERPRET_RUNTIME_ERROR;
-      }
+      CHECK_POSITIVE_INTEGER(0, "Expression for die sides must be a positive integer.");
+      CHECK_POSITIVE_INTEGER(1, "Expression for number of die must be a positive integer.");
       int sides = AS_INTEGER(pop());
       int ndice = AS_INTEGER(pop());
       ObjCollection* c = makeCollection();
@@ -150,19 +114,11 @@ static InterpretResult run() {
         int r = arc4random_uniform(sides) + 1;
         addToCollection(c, r);
       }
-    }
       break;
+    }
     case OP_MZDIE: {
-            if (!IS_INTEGER(peek(0))) {
-        // TODO: must be > 0
-        runtimeError("Expression for die sides must be an integer.");
-        return INTERPRET_RUNTIME_ERROR;
-      }
-      if (!IS_INTEGER(peek(1))) {
-        // TODO: must be > 0
-        runtimeError("Expression for number of die must be an integer.");
-        return INTERPRET_RUNTIME_ERROR;
-      }
+      CHECK_POSITIVE_INTEGER(0, "Expression for die sides must be a positive integer.");
+      CHECK_POSITIVE_INTEGER(1, "Expression for number of die must be a positive integer.");
       int sides = AS_INTEGER(pop());
       int ndice = AS_INTEGER(pop());
       ObjCollection* c = makeCollection();
@@ -171,35 +127,33 @@ static InterpretResult run() {
         int r = arc4random_uniform(sides);
         addToCollection(c, r);
       }
-    }
       break;
+    }
     case OP_MKCOLLECTION: {
       ObjCollection* c = makeCollection();
       push(OBJ_VAL(c));
-    }
       break;
+    }
     case OP_MKPAIR: {
       Value b = pop();
       Value a = pop();
       ObjPair* p = makePair(a, b);
       push(OBJ_VAL(p));
-    }
       break;
-    case OP_MOD: BINARY_OP(INTEGER_VAL, %); break;
-    case OP_MULTIPLY: BINARY_OP(INTEGER_VAL, *); break;
+    }
+    case OP_MOD:
+      BINARY_OP(INTEGER_VAL, %);
+      break;
+    case OP_MULTIPLY:
+      BINARY_OP(INTEGER_VAL, *);
+      break;
     case OP_NEGATE: {
-      if (!IS_INTEGER(peek(0))) {
-        runtimeError("Operand to unary minus must be an integer.");
-        return INTERPRET_RUNTIME_ERROR;
-      }
+      CHECK_INTEGER(0, "Operand to unary minus must be an integer.");
       push(INTEGER_VAL(-AS_INTEGER(pop())));
-    }
       break;
+    }
     case OP_QUESTION: {
-      if (!IS_REAL(peek(0))) {
-        runtimeError("Operand to '?' must be a real number in range (0, 1).");
-        return INTERPRET_RUNTIME_ERROR;
-      }
+      CHECK_REAL(0, "Operand to '?' must be a real number in range (0, 1).");
       double p = AS_REAL(pop());
       double v = (double)arc4random()/UINT32_MAX;
       if (v < p) {
@@ -208,31 +162,33 @@ static InterpretResult run() {
         ObjCollection* c = makeCollection();
         push(OBJ_VAL(c));
       }
-    }
       break;
+    }
     case OP_RETURN: {
       printValue(pop());
       printf("\n");
       return INTERPRET_OK;
     }
     case OP_SECOND: {
-      if (!IS_PAIR(peek(0))) {
-        runtimeError("Operand must be a pair.");
-        return INTERPRET_RUNTIME_ERROR;
-      }
+      CHECK_PAIR(0, "Operand must be a pair.");
       ObjPair* p = AS_PAIR(pop());
       push(p->b);
-    }
       break;
-    case OP_SUBTRACT: BINARY_OP(INTEGER_VAL, -); break;
-    case OP_VCONCC: BINARY_STRING_OP("cc"); break;
-    case OP_VCONCL: BINARY_STRING_OP("cl"); break;
-    case OP_VCONCR: BINARY_STRING_OP("cr"); break;
+    }
+    case OP_SUBTRACT:
+      BINARY_OP(INTEGER_VAL, -);
+      break;
+    case OP_VCONCC:
+      BINARY_STRING_OP("cc");
+      break;
+    case OP_VCONCL:
+      BINARY_STRING_OP("cl");
+      break;
+    case OP_VCONCR:
+      BINARY_STRING_OP("cr");
+      break;
     case OP_ZERO_DIE: {
-      if (!IS_INTEGER(peek(0))) {
-        runtimeError("Expression for die sides must be an integer.");
-        return INTERPRET_RUNTIME_ERROR;
-      }
+      CHECK_POSITIVE_INTEGER(0, "Expression for die sides must be a positive integer.");
       int sides = AS_INTEGER(pop());
       // see block for OP_DIE
       push(INTEGER_VAL(arc4random_uniform(sides)));
@@ -240,10 +196,6 @@ static InterpretResult run() {
     }
     }
   }
-
-  #undef READ_BYTE
-  #undef READ_CONSTANT
-  #undef BINARY_OP
 }
 
 static Value peek(int distance) {
