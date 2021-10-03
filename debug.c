@@ -70,12 +70,16 @@ int disassembleInstruction(Chunk* chunk, int offset) {
     return simpleInstruction("OP_NEGATE", offset);
   case OP_QUESTION:
     return simpleInstruction("OP_QUESTION", offset);
+  case OP_RANGE:
+    return simpleInstruction("OP_RANGE", offset);
   case OP_RETURN:
     return simpleInstruction("OP_RETURN", offset);
   case OP_SECOND:
     return simpleInstruction("OP_SECOND", offset);
   case OP_SUBTRACT:
     return simpleInstruction("OP_SUBTRACT", offset);
+  case OP_UNION:
+    return simpleInstruction("OP_UNION", offset);
   case OP_VCONCC:
     return simpleInstruction("OP_VCONCC", offset);
   case OP_VCONCL:

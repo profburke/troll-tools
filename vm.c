@@ -162,6 +162,18 @@ static InterpretResult run() {
       }
       break;
     }
+    case OP_RANGE: {
+      CHECK_INTEGER(0, "Operands to range must be integers.");
+      CHECK_INTEGER(1, "Operands to range must be integers.");
+      int r = AS_INTEGER(pop());
+      int l = AS_INTEGER(pop());
+      ObjCollection* c = makeCollection();
+      for (int i = l; i < r; i++) {
+        addToCollection(c, i);
+      }
+      push(OBJ_VAL(c));
+      break;
+    }
     case OP_RETURN: {
       printValue(pop());
       printf("\n");
@@ -176,6 +188,21 @@ static InterpretResult run() {
     case OP_SUBTRACT:
       BINARY_OP(INTEGER_VAL, -);
       break;
+    case OP_UNION: {
+      CHECK_COLLECTION(0, "Union operands must be collections.");
+      CHECK_COLLECTION(1, "Union operands must be collections.");
+      ObjCollection *c = AS_COLLECTION(pop());
+      ObjCollection *d = AS_COLLECTION(pop());
+      ObjCollection *u = makeCollection();
+      for (int i = 0; i < c->count; i++) {
+        addToCollection(u, c->ints[i]);
+      }
+      for (int i = 0; i < d->count; i++) {
+        addToCollection(u, d->ints[i]);
+      }
+      push(OBJ_VAL(u));
+      break;
+    }
     case OP_VCONCC:
       BINARY_STRING_OP("cc");
       break;

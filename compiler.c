@@ -35,12 +35,18 @@ typedef struct {
 
 typedef enum {
   PREC_NONE,
-  PREC_CONCAT,
+  PREC_SEMICOLON, 
+  PREC_ELSE, // else, while, until, do
+  PREC_CONCAT, // <|, |>, etc,
+  PREC_RANGE, // ..
+  PREC_DROP, // drop, keep, pick, --
+  PREC_UNION, // U, &
   PREC_TERM,
   PREC_FACTOR,
   PREC_UNARY_MINUS,
   PREC_AGGREGATE, // choose, count, sum, ..., %1, %2
-  PREC_MULTIDIE,
+  PREC_RELATIONAL,
+  PREC_MULTIDIE, // infix D, infix Z, #, ~
   PREC_DIE,
   PREC_PRIMARY
 } Precedence;
@@ -173,7 +179,6 @@ static void grouping() {
 static void unary() {
   TokenType operatorType = parser.previous.type;
 
-  // TODO: correct precedence?
   parsePrecedence(PREC_UNARY_MINUS);
 
   switch (operatorType) {
@@ -212,6 +217,8 @@ static void binary() {
   case TOKEN_VCONCC: emitByte(OP_VCONCC); break;
   case TOKEN_DIE: emitByte(OP_MDIE); break;
   case TOKEN_ZERO_DIE: emitByte(OP_MZDIE); break;
+  case TOKEN_UNION: emitByte(OP_UNION); break;
+  case TOKEN_DOT_DOT: emitByte(OP_RANGE); break;
   default: return;
   }
 }
@@ -274,7 +281,7 @@ static void parsePrecedence(Precedence precedence) {
 ParseRule rules[] = {
   [TOKEN_DIE]           = {dieroll, binary, PREC_MULTIDIE},
   [TOKEN_ZERO_DIE]      = {dieroll, binary, PREC_MULTIDIE},
-  [TOKEN_UNION]         = {NULL, NULL, PREC_NONE},
+  [TOKEN_UNION]         = {NULL, binary, PREC_UNION},
   [TOKEN_PLUS]          = {NULL, binary, PREC_TERM},
   [TOKEN_TIMES]         = {NULL, binary, PREC_FACTOR},
   [TOKEN_DIVIDE]        = {NULL, binary, PREC_FACTOR},
@@ -301,7 +308,7 @@ ParseRule rules[] = {
   [TOKEN_GT]            = {NULL, NULL, PREC_NONE},
   [TOKEN_LE]            = {NULL, NULL, PREC_NONE},
   [TOKEN_GE]            = {NULL, NULL, PREC_NONE},
-  [TOKEN_DOT_DOT]       = {NULL, NULL, PREC_NONE},
+  [TOKEN_DOT_DOT]       = {NULL, binary, PREC_RANGE},
   [TOKEN_HCONC]         = {NULL, binary, PREC_CONCAT},
   [TOKEN_VCONCL]        = {NULL, binary, PREC_CONCAT},
   [TOKEN_VCONCR]        = {NULL, binary, PREC_CONCAT},
