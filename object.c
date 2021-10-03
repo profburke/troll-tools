@@ -58,6 +58,7 @@ ObjPair* makePair(Value a, Value b) {
 void printObject(Value value) {
   switch (OBJ_TYPE(value)) {
   case OBJ_COLLECTION: {
+    // TODO: collection values should display sorted
     ObjCollection* c = AS_COLLECTION(value);
     printf("{");
     for (int i = 0; i < c->count; i++) {

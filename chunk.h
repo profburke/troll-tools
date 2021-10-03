@@ -12,6 +12,8 @@ typedef enum {
   OP_CONSTANT,
   OP_FIRST,
   OP_HCONC,
+  OP_MDIE,
+  OP_MZDIE,
   OP_MKCOLLECTION,
   OP_MKPAIR,
   OP_MOD,

@@ -131,6 +131,48 @@ static InterpretResult run() {
     }
       break;
     case OP_HCONC: BINARY_STRING_OP("h"); break;
+    case OP_MDIE: {
+      if (!IS_INTEGER(peek(0))) {
+        // TODO: must be > 0
+        runtimeError("Expression for die sides must be an integer.");
+        return INTERPRET_RUNTIME_ERROR;
+      }
+      if (!IS_INTEGER(peek(1))) {
+        // TODO: must be > 0
+        runtimeError("Expression for number of die must be an integer.");
+        return INTERPRET_RUNTIME_ERROR;
+      }
+      int sides = AS_INTEGER(pop());
+      int ndice = AS_INTEGER(pop());
+      ObjCollection* c = makeCollection();
+      push(OBJ_VAL(c));
+      for (int i = 0; i < ndice; i++) {
+        int r = arc4random_uniform(sides) + 1;
+        addToCollection(c, r);
+      }
+    }
+      break;
+    case OP_MZDIE: {
+            if (!IS_INTEGER(peek(0))) {
+        // TODO: must be > 0
+        runtimeError("Expression for die sides must be an integer.");
+        return INTERPRET_RUNTIME_ERROR;
+      }
+      if (!IS_INTEGER(peek(1))) {
+        // TODO: must be > 0
+        runtimeError("Expression for number of die must be an integer.");
+        return INTERPRET_RUNTIME_ERROR;
+      }
+      int sides = AS_INTEGER(pop());
+      int ndice = AS_INTEGER(pop());
+      ObjCollection* c = makeCollection();
+      push(OBJ_VAL(c));
+      for (int i = 0; i < ndice; i++) {
+        int r = arc4random_uniform(sides);
+        addToCollection(c, r);
+      }
+    }
+      break;
     case OP_MKCOLLECTION: {
       ObjCollection* c = makeCollection();
       push(OBJ_VAL(c));

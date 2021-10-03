@@ -210,6 +210,8 @@ static void binary() {
   case TOKEN_VCONCL: emitByte(OP_VCONCL); break;
   case TOKEN_VCONCR: emitByte(OP_VCONCR); break;
   case TOKEN_VCONCC: emitByte(OP_VCONCC); break;
+  case TOKEN_DIE: emitByte(OP_MDIE); break;
+  case TOKEN_ZERO_DIE: emitByte(OP_MZDIE); break;
   default: return;
   }
 }
@@ -270,8 +272,8 @@ static void parsePrecedence(Precedence precedence) {
 }
 
 ParseRule rules[] = {
-  [TOKEN_DIE]           = {dieroll, NULL, PREC_DIE},
-  [TOKEN_ZERO_DIE]      = {dieroll, NULL, PREC_DIE},
+  [TOKEN_DIE]           = {dieroll, binary, PREC_MULTIDIE},
+  [TOKEN_ZERO_DIE]      = {dieroll, binary, PREC_MULTIDIE},
   [TOKEN_UNION]         = {NULL, NULL, PREC_NONE},
   [TOKEN_PLUS]          = {NULL, binary, PREC_TERM},
   [TOKEN_TIMES]         = {NULL, binary, PREC_FACTOR},

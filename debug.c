@@ -54,6 +54,10 @@ int disassembleInstruction(Chunk* chunk, int offset) {
     return simpleInstruction("OP_FIRST", offset);
   case OP_HCONC:
     return simpleInstruction("OP_HCONC", offset);
+  case OP_MDIE:
+    return simpleInstruction("OP_MDIE", offset);
+  case OP_MZDIE:
+    return simpleInstruction("OP_MZDIE", offset);
   case OP_MKCOLLECTION:
     return simpleInstruction("OP_MKCOLLECTION", offset);
   case OP_MKPAIR:
