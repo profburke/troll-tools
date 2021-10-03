@@ -46,7 +46,7 @@ struct ObjString {
 
 void addToCollection(ObjCollection* c, int n);
 ObjString* copyString(const char* chars, int length);
-ObjCollection* makeCollection(); // TODO: rename makeX to initX
+ObjCollection* makeCollection(void); // TODO: rename makeX to initX
 ObjPair* makePair(Value a, Value b);
 void printObject(Value value);
 ObjString* takeString(char* chars, int length);
