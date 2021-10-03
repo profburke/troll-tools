@@ -3,6 +3,7 @@ TVMSRCS = chunk.c \
           object.c \
           vm-main.c \
           memory.c \
+          random.c \
           value.c \
           vm.c
 

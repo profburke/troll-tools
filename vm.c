@@ -7,6 +7,7 @@
 #include "debug.h"
 #include "memory.h"
 #include "object.h"
+#include "random.h"
 #include "vm.h"
 #include "vm-macros.h"
 
@@ -85,10 +86,7 @@ static InterpretResult run() {
     case OP_DIE: {
       CHECK_POSITIVE_INTEGER(0, "Expression for die sides must be a positive integer.");
       int sides = AS_INTEGER(pop());
-      // TODO: need to abstract this out so that we can easily include
-      // different functions for different platforms (is arc4random available
-      // on Arduino/ESP8266 ?
-      push(INTEGER_VAL(arc4random_uniform(sides) + 1));
+      push(INTEGER_VAL(randomi(sides) + 1));
       break;
     }
     case OP_DIVIDE:
@@ -111,7 +109,7 @@ static InterpretResult run() {
       ObjCollection* c = makeCollection();
       push(OBJ_VAL(c));
       for (int i = 0; i < ndice; i++) {
-        int r = arc4random_uniform(sides) + 1;
+        int r = randomi(sides) + 1;
         addToCollection(c, r);
       }
       break;
@@ -124,7 +122,7 @@ static InterpretResult run() {
       ObjCollection* c = makeCollection();
       push(OBJ_VAL(c));
       for (int i = 0; i < ndice; i++) {
-        int r = arc4random_uniform(sides);
+        int r = randomi(sides + 1);
         addToCollection(c, r);
       }
       break;
@@ -155,7 +153,7 @@ static InterpretResult run() {
     case OP_QUESTION: {
       CHECK_REAL(0, "Operand to '?' must be a real number in range (0, 1).");
       double p = AS_REAL(pop());
-      double v = (double)arc4random()/UINT32_MAX;
+      double v = uniform();
       if (v < p) {
         push(INTEGER_VAL(1));
       } else {
@@ -190,8 +188,7 @@ static InterpretResult run() {
     case OP_ZERO_DIE: {
       CHECK_POSITIVE_INTEGER(0, "Expression for die sides must be a positive integer.");
       int sides = AS_INTEGER(pop());
-      // see block for OP_DIE
-      push(INTEGER_VAL(arc4random_uniform(sides)));
+      push(INTEGER_VAL(randomi(sides + 1)));
       break;
     }
     }
