@@ -45,10 +45,14 @@ struct ObjString {
 };
 
 void addToCollection(ObjCollection* c, int n);
+ObjCollection* copyCollection(const ObjCollection* c);
 ObjString* copyString(const char* chars, int length);
+int findFirstIndex(const ObjCollection* c, int element);
 ObjCollection* makeCollection(void); // TODO: rename makeX to initX
 ObjPair* makePair(Value a, Value b);
+int member(ObjCollection* c, int item);
 void printObject(Value value);
+void removeAtIndex(ObjCollection* c, int index);
 ObjString* takeString(char* chars, int length);
 
 static inline bool isObjType(Value value, ObjType type) {

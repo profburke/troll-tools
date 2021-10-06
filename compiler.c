@@ -227,6 +227,10 @@ static void binary() {
   case TOKEN_LE: emitByte(OP_LE); break;
   case TOKEN_GE: emitByte(OP_GE); break;
   case TOKEN_AND: emitByte(OP_AND); break;
+  case TOKEN_DROP: emitByte(OP_DROP); break;
+  case TOKEN_KEEP: emitByte(OP_KEEP); break;
+  case TOKEN_PICK: emitByte(OP_PICK); break;
+  case TOKEN_SET_MINUS: emitByte(OP_SETMINUS); break;
   default: return;
   }
 }
@@ -236,7 +240,7 @@ static void question() {
   consume(TOKEN_REAL, "Expect number in range (0, 1.0) after '?'.");
   double value = strtod(parser.previous.start, NULL);
   if (value < 0 || value >= 1.0) {
-    // TODO: error -- repeat above error message
+    errorAtCurrent("Expect number in range (0, 1.0) after '?'.");
   }
   emitConstant(REAL_VAL(value));
   emitByte(OP_QUESTION);
@@ -248,7 +252,7 @@ static void collection() {
   if (parser.current.type != TOKEN_RBRACE) {
     while (1) {
       if (count == 255) {
-        // TODO: error -- too many expressions in collection
+        errorAtCurrent("Collections cannot contain more than 256 expressions.");
       }
       expression();
       count++;
@@ -337,7 +341,7 @@ ParseRule rules[] = {
   [TOKEN_LBRACK]        = {pair, NULL, PREC_NONE},
   [TOKEN_RBRACK]        = {NULL, NULL, PREC_NONE},
   [TOKEN_MINUS]         = {unary, binary, PREC_TERM},
-  [TOKEN_SET_MINUS]     = {NULL, NULL, PREC_NONE},
+  [TOKEN_SET_MINUS]     = {NULL, binary, PREC_DROP},
   [TOKEN_ASSIGN]        = {NULL, NULL, PREC_NONE},
   [TOKEN_EQ]            = {NULL, binary, PREC_RELATIONAL},
   [TOKEN_NEQ]           = {NULL, binary, PREC_RELATIONAL},
@@ -362,9 +366,9 @@ ParseRule rules[] = {
   [TOKEN_LEAST]         = {NULL, NULL, PREC_NONE},
   [TOKEN_LARGEST]       = {NULL, NULL, PREC_NONE},
   [TOKEN_COUNT]         = {NULL, NULL, PREC_NONE},
-  [TOKEN_DROP]          = {NULL, NULL, PREC_NONE},
-  [TOKEN_KEEP]          = {NULL, NULL, PREC_NONE},
-  [TOKEN_PICK]          = {NULL, NULL, PREC_NONE},
+  [TOKEN_DROP]          = {NULL, binary, PREC_DROP},
+  [TOKEN_KEEP]          = {NULL, binary, PREC_DROP},
+  [TOKEN_PICK]          = {NULL, binary, PREC_DROP},
   [TOKEN_MEDIAN]        = {NULL, NULL, PREC_NONE},
   [TOKEN_IN]            = {NULL, NULL, PREC_NONE},
   [TOKEN_REPEAT]        = {NULL, NULL, PREC_NONE},

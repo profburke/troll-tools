@@ -34,11 +34,34 @@ static ObjString* allocateString(char* chars, int length) {
   return string;
 }
 
+ObjCollection* copyCollection(const ObjCollection* c) {
+  ObjCollection* r = makeCollection();
+  r->capacity = c->capacity;
+  r->count = c->count;
+  size_t size = c->capacity * sizeof(int);
+  
+  int* ints = (int*)reallocate(NULL, 0, size);
+  memcpy(ints, c->ints, size);
+  r->ints = ints;
+  
+  return r;
+}
+
 ObjString* copyString(const char* chars, int length) {
   char* heapChars = (char*)ALLOCATE(char, length + 1);
   memcpy(heapChars, chars, length);
   heapChars[length] = '\0';
   return allocateString(heapChars, length);
+}
+
+int findFirstIndex(const ObjCollection* c, int element) {
+  for (int i = 0; i < c->count; i++) {
+    if (c->ints[i] == element) {
+      return i;
+    }
+  }
+  
+  return -1;
 }
 
 ObjCollection* makeCollection() {
@@ -54,6 +77,14 @@ ObjPair* makePair(Value a, Value b) {
   pair->a = a;
   pair->b = b;
   return pair;
+}
+
+int member(ObjCollection* c, int item) {
+  for (int i = 0; i < c->count; i++) {
+    if (item == c->ints[i]) { return 1; }
+  }
+  
+  return 0;
 }
 
 static int comp(const void* e1, const void* e2) {
@@ -90,6 +121,14 @@ void printObject(Value value) {
     break;
   case OBJ_STRING: printf("%s", AS_CSTRING(value)); break;
   }
+}
+
+// TODO: when count/capacity reaches ??, shrink the array
+void removeAtIndex(ObjCollection* c, int index) {
+  for (int i = index; i < c->count; i++) {
+    c->ints[i] = c->ints[i+1];
+  }
+  c->count--;
 }
 
 ObjString* takeString(char* chars, int length) {

@@ -104,6 +104,21 @@ static InterpretResult run() {
     case OP_DIVIDE:
       BINARY_OP(INTEGER_VAL, /);
       break;
+    case OP_DROP: {
+      CHECK_COLLECTION(0, "Operands to drop must be collections.");
+      CHECK_COLLECTION(1, "Operands to drop must be collections.");
+      ObjCollection* d = AS_COLLECTION(pop());
+      ObjCollection* c = AS_COLLECTION(pop());
+      ObjCollection* r = makeCollection();
+      for (int i = 0; i < c->count; i++) {
+        int item = c->ints[i];
+        if (!member(d, item)) {
+          addToCollection(r, item);
+        }
+      }
+      push(OBJ_VAL(r));
+      break;
+    }
     case OP_EQ:
       REL_OP(==);
       break;
@@ -122,6 +137,21 @@ static InterpretResult run() {
     case OP_HCONC:
       BINARY_STRING_OP("h");
       break;
+    case OP_KEEP: {
+      CHECK_COLLECTION(0, "Operands to drop must be collections.");
+      CHECK_COLLECTION(1, "Operands to drop must be collections.");
+      ObjCollection* d = AS_COLLECTION(pop());
+      ObjCollection* c = AS_COLLECTION(pop());
+      ObjCollection* r = makeCollection();
+      for (int i = 0; i < c->count; i++) {
+        int item = c->ints[i];
+        if (member(d, item)) {
+          addToCollection(r, item);
+        }
+      }
+      push(OBJ_VAL(r));
+      break;
+    }
     case OP_LE:
       REL_OP(<=);
       break;
@@ -180,6 +210,26 @@ static InterpretResult run() {
     case OP_NEQ:
       REL_OP(!=);
       break;
+    case OP_PICK: {
+      CHECK_INTEGER(0, "Right operand to 'pick' must be a positive integer.");
+      // TODO: check right operand is > 0
+      CHECK_COLLECTION(1, "Left operand to 'pick' must be a collection.");
+      int n = AS_INTEGER(pop());
+      ObjCollection* c = AS_COLLECTION(pop());
+      ObjCollection* candidates = copyCollection(c);
+      if (n >= candidates->count) {
+        push(OBJ_VAL(candidates));
+      } else {
+        ObjCollection* r = makeCollection();
+        for (int i = 0; i < n; i ++) {
+          int index = randomi(candidates->count);
+          addToCollection(r, candidates->ints[index]);
+          removeAtIndex(candidates, index);
+        }
+        push(OBJ_VAL(r));
+      }
+      break;
+    }
     case OP_QUESTION: {
       CHECK_REAL(0, "Operand to '?' must be a real number in range (0, 1).");
       double p = AS_REAL(pop());
@@ -215,14 +265,30 @@ static InterpretResult run() {
       push(p->b);
       break;
     }
+    case OP_SETMINUS: {
+      CHECK_COLLECTION(0, "Union operands must be collections.");
+      CHECK_COLLECTION(1, "Union operands must be collections.");
+      ObjCollection *d = AS_COLLECTION(pop());
+      ObjCollection *c = AS_COLLECTION(pop());
+      ObjCollection *r = copyCollection(c);
+
+      for (int i = 0; i < d->count; i++) {
+        int index = findFirstIndex(r, d->ints[i]);
+        if (index > -1) {
+          removeAtIndex(r, index);
+        }
+      }
+      push(OBJ_VAL(r));
+      break;
+    }
     case OP_SUBTRACT:
       BINARY_OP(INTEGER_VAL, -);
       break;
     case OP_UNION: {
       CHECK_COLLECTION(0, "Union operands must be collections.");
       CHECK_COLLECTION(1, "Union operands must be collections.");
-      ObjCollection *c = AS_COLLECTION(pop());
       ObjCollection *d = AS_COLLECTION(pop());
+      ObjCollection *c = AS_COLLECTION(pop());
       ObjCollection *u = makeCollection();
       for (int i = 0; i < c->count; i++) {
         addToCollection(u, c->ints[i]);
