@@ -25,6 +25,7 @@ static void question(void);
 static void string(void);
 static void pair(void);
 static void pairSelector(void);
+static void collection(void);
 
 typedef struct {
   Token current;
@@ -234,9 +235,38 @@ static void question() {
   // already consumed the '?'
   consume(TOKEN_REAL, "Expect number in range (0, 1.0) after '?'.");
   double value = strtod(parser.previous.start, NULL);
-  // TODO: check that 0 < value < 1
+  if (value < 0 || value >= 1.0) {
+    // TODO: error -- repeat above error message
+  }
   emitConstant(REAL_VAL(value));
   emitByte(OP_QUESTION);
+}
+
+static void collection() {
+  uint8_t count = 0;
+  
+  if (parser.current.type != TOKEN_RBRACE) {
+    while (1) {
+      if (count == 255) {
+        // TODO: error -- too many expressions in collection
+      }
+      expression();
+      count++;
+
+      if (parser.current.type == TOKEN_RBRACE) {
+        break;
+      }
+      consume(TOKEN_COMMA, "Expecting ',' between expressions in a collection.");
+    } 
+  }
+
+  consume(TOKEN_RBRACE, "Expecting '}' at end of collection.");
+
+  emitByte(OP_MKCOLLECTION);
+
+  if (count > 0) {
+    emitBytes(OP_ADD2CLLCTN, count);
+  }
 }
 
 static void pair() {
@@ -296,7 +326,7 @@ ParseRule rules[] = {
   [TOKEN_RPAREN]        = {NULL, NULL, PREC_NONE},
   [TOKEN_COMMA]         = {NULL, NULL, PREC_NONE},
   [TOKEN_SEMICOLON]     = {NULL, NULL, PREC_NONE},
-  [TOKEN_LBRACE]        = {NULL, NULL, PREC_NONE},
+  [TOKEN_LBRACE]        = {collection, NULL, PREC_NONE},
   [TOKEN_RBRACE]        = {NULL, NULL, PREC_NONE},
   [TOKEN_TILDE]         = {NULL, NULL, PREC_NONE},
   [TOKEN_BANG]          = {NULL, NULL, PREC_NONE},
