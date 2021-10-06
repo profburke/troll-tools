@@ -219,6 +219,12 @@ static void binary() {
   case TOKEN_ZERO_DIE: emitByte(OP_MZDIE); break;
   case TOKEN_UNION: emitByte(OP_UNION); break;
   case TOKEN_DOT_DOT: emitByte(OP_RANGE); break;
+  case TOKEN_EQ: emitByte(OP_EQ); break;
+  case TOKEN_LT: emitByte(OP_LT); break;
+  case TOKEN_GT: emitByte(OP_GT); break;
+  case TOKEN_NEQ: emitByte(OP_NEQ); break;
+  case TOKEN_LE: emitByte(OP_LE); break;
+  case TOKEN_GE: emitByte(OP_GE); break;
   default: return;
   }
 }
@@ -302,12 +308,12 @@ ParseRule rules[] = {
   [TOKEN_MINUS]         = {unary, binary, PREC_TERM},
   [TOKEN_SET_MINUS]     = {NULL, NULL, PREC_NONE},
   [TOKEN_ASSIGN]        = {NULL, NULL, PREC_NONE},
-  [TOKEN_EQ]            = {NULL, NULL, PREC_NONE},
-  [TOKEN_NEQ]           = {NULL, NULL, PREC_NONE},
-  [TOKEN_LT]            = {NULL, NULL, PREC_NONE},
-  [TOKEN_GT]            = {NULL, NULL, PREC_NONE},
-  [TOKEN_LE]            = {NULL, NULL, PREC_NONE},
-  [TOKEN_GE]            = {NULL, NULL, PREC_NONE},
+  [TOKEN_EQ]            = {NULL, binary, PREC_RELATIONAL},
+  [TOKEN_NEQ]           = {NULL, binary, PREC_RELATIONAL},
+  [TOKEN_LT]            = {NULL, binary, PREC_RELATIONAL},
+  [TOKEN_GT]            = {NULL, binary, PREC_RELATIONAL},
+  [TOKEN_LE]            = {NULL, binary, PREC_RELATIONAL},
+  [TOKEN_GE]            = {NULL, binary, PREC_RELATIONAL},
   [TOKEN_DOT_DOT]       = {NULL, binary, PREC_RANGE},
   [TOKEN_HCONC]         = {NULL, binary, PREC_CONCAT},
   [TOKEN_VCONCL]        = {NULL, binary, PREC_CONCAT},

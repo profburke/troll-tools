@@ -92,14 +92,29 @@ static InterpretResult run() {
     case OP_DIVIDE:
       BINARY_OP(INTEGER_VAL, /);
       break;
+    case OP_EQ:
+      REL_OP(==);
+      break;
     case OP_FIRST: {
       CHECK_PAIR(0, "Operand must be a pair.");
       ObjPair* p = AS_PAIR(pop());
       push(p->a);
       break;
     }
+    case OP_GE:
+      REL_OP(>=);
+      break;
+    case OP_GT:
+      REL_OP(>);
+      break;
     case OP_HCONC:
       BINARY_STRING_OP("h");
+      break;
+    case OP_LE:
+      REL_OP(<=);
+      break;
+    case OP_LT:
+      REL_OP(<);
       break;
     case OP_MDIE: {
       CHECK_POSITIVE_INTEGER(0, "Expression for die sides must be a positive integer.");
@@ -150,6 +165,9 @@ static InterpretResult run() {
       push(INTEGER_VAL(-AS_INTEGER(pop())));
       break;
     }
+    case OP_NEQ:
+      REL_OP(!=);
+      break;
     case OP_QUESTION: {
       CHECK_REAL(0, "Operand to '?' must be a real number in range (0, 1).");
       double p = AS_REAL(pop());

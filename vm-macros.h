@@ -1,6 +1,21 @@
 #ifndef tvm_vm_macros_h
 #define tvm_vm_macros_h
 
+#define REL_OP(op)                                              \
+  do {                                                          \
+    CHECK_COLLECTION(0, "Can only filter collections.");        \
+    CHECK_INTEGER(1, "Filter value must be an integer.");       \
+    ObjCollection* c = AS_COLLECTION(pop());                    \
+    int f = AS_INTEGER(pop());                                  \
+    ObjCollection* r = makeCollection();                        \
+    for (int i = 0; i < c->count; i++) {                        \
+      if (f op c->ints[i]) {                                    \
+        addToCollection(r, c->ints[i]);                         \
+      }                                                         \
+    }                                                           \
+    push(OBJ_VAL(r));                                           \
+  } while(false)
+
 #define BINARY_OP(valueType, op) \
   do { \
     CHECK_INTEGER(0, "Operands to binary operator must be integers."); \
