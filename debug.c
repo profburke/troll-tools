@@ -44,6 +44,8 @@ int disassembleInstruction(Chunk* chunk, int offset) {
     return simpleInstruction("OP_ADD", offset);
   case OP_ADD2CLLCTN:
     return byteInstruction("OP_ADD2CLLCTN", chunk, offset);
+  case OP_AND:
+    return simpleInstruction("OP_AND", offset);
   case OP_CONSTANT:
     return constantInstruction("OP_CONSTANT", chunk, offset);
   case OP_DIE:

@@ -225,6 +225,7 @@ static void binary() {
   case TOKEN_NEQ: emitByte(OP_NEQ); break;
   case TOKEN_LE: emitByte(OP_LE); break;
   case TOKEN_GE: emitByte(OP_GE); break;
+  case TOKEN_AND: emitByte(OP_AND); break;
   default: return;
   }
 }
@@ -299,7 +300,7 @@ ParseRule rules[] = {
   [TOKEN_RBRACE]        = {NULL, NULL, PREC_NONE},
   [TOKEN_TILDE]         = {NULL, NULL, PREC_NONE},
   [TOKEN_BANG]          = {NULL, NULL, PREC_NONE},
-  [TOKEN_AND]           = {NULL, NULL, PREC_NONE},
+  [TOKEN_AND]           = {NULL, binary, PREC_UNION},
   [TOKEN_HASH]          = {NULL, NULL, PREC_NONE},
   [TOKEN_QUESTION]      = {question, NULL, PREC_NONE}, // TODO: we don't really need precedence, do we?
   [TOKEN_SAMPLE]        = {NULL, NULL, PREC_NONE},

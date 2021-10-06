@@ -78,6 +78,18 @@ static InterpretResult run() {
       push(OBJ_VAL(c));
       break;
     }
+    case OP_AND: {
+      CHECK_COLLECTION(0, "Operands to '&' must be collections.");
+      CHECK_COLLECTION(1, "Operands to '&' must be collections.");
+      ObjCollection* c = AS_COLLECTION(pop());
+      ObjCollection* d = AS_COLLECTION(pop());
+      if (c->count == 0) {
+        push(OBJ_VAL(makeCollection()));
+      } else {
+        push(OBJ_VAL(d));
+      }
+      break;
+    }
     case OP_CONSTANT: {
       Value constant = READ_CONSTANT();
       push(constant);

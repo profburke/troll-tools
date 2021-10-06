@@ -7,6 +7,7 @@
 typedef enum {
   OP_ADD,
   OP_ADD2CLLCTN, // following byte is count of # of ints to pop off stack and add to c
+  OP_AND,
   OP_CONSTANT,
   OP_DIE,
   OP_DIVIDE,
