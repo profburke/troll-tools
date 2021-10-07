@@ -46,10 +46,14 @@ int disassembleInstruction(Chunk* chunk, int offset) {
     return byteInstruction("OP_ADD2CLLCTN", chunk, offset);
   case OP_AND:
     return simpleInstruction("OP_AND", offset);
+  case OP_CHOOSE:
+    return simpleInstruction("OP_CHOOSE", offset);
   case OP_CONSTANT:
     return constantInstruction("OP_CONSTANT", chunk, offset);
   case OP_DIE:
     return simpleInstruction("OP_DIE", offset);
+  case OP_DIFFERENT:
+    return simpleInstruction("OP_DIFFERENT", offset);
   case OP_DIVIDE:
     return simpleInstruction("OP_DIVIDE", offset);
   case OP_DROP:
@@ -70,10 +74,18 @@ int disassembleInstruction(Chunk* chunk, int offset) {
     return simpleInstruction("OP_LE", offset);
   case OP_LT:
     return simpleInstruction("OP_LT", offset);
+  case OP_MAX:
+    return simpleInstruction("OP_MAX", offset);
+  case OP_MAXIMAL:
+    return simpleInstruction("OP_MAXIMAL", offset);
   case OP_MDIE:
     return simpleInstruction("OP_MDIE", offset);
-  case OP_MZDIE:
-    return simpleInstruction("OP_MZDIE", offset);
+  case OP_MEDIAN:
+    return simpleInstruction("OP_MDIE", offset);
+  case OP_MIN:
+    return simpleInstruction("OP_MIN", offset);
+  case OP_MINIMAL:
+    return simpleInstruction("OP_MINIMAL", offset);
   case OP_MKCOLLECTION:
     return simpleInstruction("OP_MKCOLLECTION", offset);
   case OP_MKPAIR:
@@ -82,6 +94,8 @@ int disassembleInstruction(Chunk* chunk, int offset) {
     return simpleInstruction("OP_MOD", offset);
   case OP_MULTIPLY:
     return simpleInstruction("OP_MULTIPLY", offset);
+  case OP_MZDIE:
+    return simpleInstruction("OP_MZDIE", offset);
   case OP_NEGATE:
     return simpleInstruction("OP_NEGATE", offset);
   case OP_NEQ:
@@ -100,8 +114,12 @@ int disassembleInstruction(Chunk* chunk, int offset) {
     return simpleInstruction("OP_SECOND", offset);
   case OP_SETMINUS:
     return simpleInstruction("OP_SETMINUS", offset);
+  case OP_SGN:
+    return simpleInstruction("OP_SGN", offset);
   case OP_SUBTRACT:
     return simpleInstruction("OP_SUBTRACT", offset);
+  case OP_SUM:
+    return simpleInstruction("OP_SUM", offset);
   case OP_UNION:
     return simpleInstruction("OP_UNION", offset);
   case OP_VCONCC:

@@ -180,10 +180,23 @@ static void grouping() {
 static void unary() {
   TokenType operatorType = parser.previous.type;
 
+  // TODO: this won't work if we use this function for various
+  // unary ops since they don't all have the same precedence...
+  // how best to handle this?
   parsePrecedence(PREC_UNARY_MINUS);
 
   switch (operatorType) {
   case TOKEN_MINUS: emitByte(OP_NEGATE); break;
+  case TOKEN_CHOOSE: emitByte(OP_CHOOSE); break;
+  case TOKEN_SUM: emitByte(OP_SUM); break;
+  case TOKEN_MIN: emitByte(OP_MIN); break;
+  case TOKEN_MAX: emitByte(OP_MAX); break;
+  case TOKEN_SGN: emitByte(OP_SGN); break;
+  case TOKEN_DIFFERENT: emitByte(OP_DIFFERENT); break;
+  case TOKEN_MINIMAL: emitByte(OP_MINIMAL); break;
+  case TOKEN_MAXIMAL: emitByte(OP_MAXIMAL); break;
+  case TOKEN_MEDIAN: emitByte(OP_MEDIAN); break;
+  case TOKEN_BANG: emitByte(OP_NOT); break;
   default: return;
   }
 }
