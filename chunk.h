@@ -10,6 +10,7 @@ typedef enum {
   OP_AND,
   OP_CHOOSE,
   OP_CONSTANT,
+  OP_COUNT,
   OP_DIE,
   OP_DIFFERENT,
   OP_DIVIDE,

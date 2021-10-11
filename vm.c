@@ -102,6 +102,12 @@ static InterpretResult run() {
       push(constant);
       break;
     }
+    case OP_COUNT: {
+      CHECK_COLLECTION(0, "Operand for 'count' must be a collection.");
+      ObjCollection *c = AS_COLLECTION(pop());
+      push(INTEGER_VAL(c->count));
+      break;
+    }
     case OP_DIE: {
       CHECK_POSITIVE_INTEGER(0, "Expression for die sides must be a positive integer.");
       int sides = AS_INTEGER(pop());

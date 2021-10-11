@@ -197,6 +197,7 @@ static void unary() {
   case TOKEN_MAXIMAL: emitByte(OP_MAXIMAL); break;
   case TOKEN_MEDIAN: emitByte(OP_MEDIAN); break;
   case TOKEN_BANG: emitByte(OP_NOT); break;
+  case TOKEN_COUNT: emitByte(OP_COUNT); break;
   default: return;
   }
 }
@@ -378,7 +379,7 @@ ParseRule rules[] = {
   [TOKEN_MOD]           = {NULL, binary, PREC_FACTOR},
   [TOKEN_LEAST]         = {NULL, NULL, PREC_NONE},
   [TOKEN_LARGEST]       = {NULL, NULL, PREC_NONE},
-  [TOKEN_COUNT]         = {NULL, NULL, PREC_NONE},
+  [TOKEN_COUNT]         = {unary, NULL, PREC_NONE},
   [TOKEN_DROP]          = {NULL, binary, PREC_DROP},
   [TOKEN_KEEP]          = {NULL, binary, PREC_DROP},
   [TOKEN_PICK]          = {NULL, binary, PREC_DROP},
