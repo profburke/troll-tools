@@ -26,6 +26,7 @@ static void string(void);
 static void pair(void);
 static void pairSelector(void);
 static void collection(void);
+static void ll(void); // find a better name
 
 typedef struct {
   Token current;
@@ -175,6 +176,19 @@ static uint8_t makeConstant(Value value) {
 static void grouping() {
   expression();
   consume(TOKEN_RPAREN, "Expect ')' after expression.");
+}
+
+static void ll() {
+  TokenType operatorType = parser.previous.type;
+
+  parsePrecedence(PREC_AGGREGATE); // integer argument
+  parsePrecedence(PREC_AGGREGATE); // collection
+  
+  switch(operatorType) {
+  case TOKEN_LARGEST: emitByte(OP_LARGEST); break;
+  case TOKEN_LEAST: emitByte(OP_LEAST); break;
+  default: return;
+  }
 }
 
 static void unary() {
@@ -377,8 +391,8 @@ ParseRule rules[] = {
   [TOKEN_SUM]           = {unary, NULL, PREC_NONE},
   [TOKEN_SGN]           = {unary, NULL, PREC_NONE},
   [TOKEN_MOD]           = {NULL, binary, PREC_FACTOR},
-  [TOKEN_LEAST]         = {NULL, NULL, PREC_NONE},
-  [TOKEN_LARGEST]       = {NULL, NULL, PREC_NONE},
+  [TOKEN_LEAST]         = {ll, NULL, PREC_NONE},
+  [TOKEN_LARGEST]       = {ll, NULL, PREC_NONE},
   [TOKEN_COUNT]         = {unary, NULL, PREC_NONE},
   [TOKEN_DROP]          = {NULL, binary, PREC_DROP},
   [TOKEN_KEEP]          = {NULL, binary, PREC_DROP},

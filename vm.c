@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -169,9 +170,37 @@ static InterpretResult run() {
       push(OBJ_VAL(r));
       break;
     }
+    case OP_LARGEST: {
+      CHECK_COLLECTION(0, "'largest' only works on collections.");
+      CHECK_INTEGER(1, "First argument to 'largest' must be an intger.");
+      ObjCollection* c = AS_COLLECTION(pop());
+      int n = AS_INTEGER(pop());
+      reverseSortCollection(c);
+      int upper = (int)fmin(c->count, n);
+      ObjCollection* r = makeCollection();
+      for (int i = 0; i < upper; i++) {
+        addToCollection(r, c->ints[i]);
+      }
+      push(OBJ_VAL(r));
+      break;
+    }
     case OP_LE:
       REL_OP(<=);
       break;
+    case OP_LEAST: {
+      CHECK_COLLECTION(0, "'least' only works on collections.");
+      CHECK_INTEGER(1, "First argument to 'least' must be an intger.");
+      ObjCollection* c = AS_COLLECTION(pop());
+      int n = AS_INTEGER(pop());
+      sortCollection(c);
+      int upper = (int)fmin(c->count, n);
+      ObjCollection* r = makeCollection();
+      for (int i = 0; i < upper; i++) {
+        addToCollection(r, c->ints[i]);
+      }
+      push(OBJ_VAL(r));
+      break;
+    }
     case OP_LT:
       REL_OP(<);
       break;

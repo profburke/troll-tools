@@ -53,6 +53,8 @@ ObjPair* makePair(Value a, Value b);
 int member(ObjCollection* c, int item);
 void printObject(Value value);
 void removeAtIndex(ObjCollection* c, int index);
+void reverseSortCollection(ObjCollection* c);
+void sortCollection(ObjCollection* c);
 ObjString* takeString(char* chars, int length);
 
 static inline bool isObjType(Value value, ObjType type) {

@@ -72,8 +72,12 @@ int disassembleInstruction(Chunk* chunk, int offset) {
     return simpleInstruction("OP_HCONC", offset);
   case OP_KEEP:
     return simpleInstruction("OP_KEEP", offset);
+  case OP_LARGEST:
+    return simpleInstruction("OP_LARGEST", offset);
   case OP_LE:
     return simpleInstruction("OP_LE", offset);
+  case OP_LEAST:
+    return simpleInstruction("OP_LEAST", offset);
   case OP_LT:
     return simpleInstruction("OP_LT", offset);
   case OP_MAX:
