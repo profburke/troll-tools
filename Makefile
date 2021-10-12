@@ -4,6 +4,7 @@ TVMSRCS = chunk.c \
           vm-main.c \
           memory.c \
           random.c \
+          table.c \
           value.c \
           vm.c
 
@@ -12,6 +13,7 @@ TROLLCSRCS = chunk.c \
              memory.c \
              object.c \
              scanner.c \
+             table.c \
              trollc-main.c \
              value.c
 
