@@ -27,6 +27,7 @@ static void pair(void);
 static void pairSelector(void);
 static void collection(void);
 static void ll(void); // find a better name
+static void various(void);
 
 typedef struct {
   Token current;
@@ -141,6 +142,16 @@ static void consume(TokenType type, const char* message) {
   errorAtCurrent(message);
 }
 
+static bool check(TokenType type) {
+  return parser.current.type == type;
+}
+
+static bool match(TokenType type) {
+  if (!check(type)) return false;
+  advance();
+  return true;
+}
+
 static void emitByte(uint8_t byte) {
   writeChunk(currentChunk(), byte, parser.previous.line);
 }
@@ -188,6 +199,29 @@ static void ll() {
   case TOKEN_LARGEST: emitByte(OP_LARGEST); break;
   case TOKEN_LEAST: emitByte(OP_LEAST); break;
   default: return;
+  }
+}
+
+static uint8_t identifierConstant(Token* name) {
+  return makeConstant(OBJ_VAL(copyString(name->start, name->length)));
+}
+
+static void defineVariable(uint8_t global) {
+  emitBytes(OP_DEFINE_GLOBAL, global);
+}
+
+static void variable() {
+  uint8_t global = identifierConstant(&parser.previous);
+  
+  if (match(TOKEN_ASSIGN)) {
+    // we're assigning to a new variable
+    expression();
+    consume(TOKEN_SEMICOLON, "Variable assignment must be followed by ';'.");
+    defineVariable(global);
+    expression();
+  } else {
+    // we're referencing an existing variable
+    emitBytes(OP_GET_GLOBAL, global);
   }
 }
 
@@ -386,7 +420,7 @@ ParseRule rules[] = {
   [TOKEN_SECOND]        = {pairSelector, NULL, PREC_NONE},
   [TOKEN_INTEGER]       = {integer, NULL, PREC_NONE},
   [TOKEN_REAL]          = {NULL, NULL, PREC_NONE},
-  [TOKEN_IDENTIFIER]    = {NULL, NULL, PREC_NONE},
+  [TOKEN_IDENTIFIER]    = {variable, NULL, PREC_NONE},
   [TOKEN_STRING]        = {string, NULL, PREC_NONE},
   [TOKEN_SUM]           = {unary, NULL, PREC_NONE},
   [TOKEN_SGN]           = {unary, NULL, PREC_NONE},

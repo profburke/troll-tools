@@ -22,10 +22,12 @@ static void runtimeError(const char* format, ...);
 VM vm;
 
 void freeVM() {
+  freeTable(&vm.globals);
 }
 
 void initVM() {
   resetStack();
+  initTable(&vm.globals);
 }
 
 InterpretResult interpret(Chunk* chunk) {
@@ -109,6 +111,12 @@ static InterpretResult run() {
       push(INTEGER_VAL(c->count));
       break;
     }
+    case OP_DEFINE_GLOBAL: {
+      ObjString* name = READ_STRING();
+      tableSet(&vm.globals, name, peek(0));
+      pop();
+      break;
+    }
     case OP_DIE: {
       CHECK_POSITIVE_INTEGER(0, "Expression for die sides must be a positive integer.");
       int sides = AS_INTEGER(pop());
@@ -149,6 +157,16 @@ static InterpretResult run() {
     case OP_GE:
       REL_OP(>=);
       break;
+    case OP_GET_GLOBAL: {
+      ObjString* name = READ_STRING();
+      Value value;
+      if (!tableGet(&vm.globals, name, &value)) {
+        runtimeError("Undefined variable '%s'.", name->chars);
+        return INTERPRET_RUNTIME_ERROR;
+      }
+      push(value);
+      break;
+    }
     case OP_GT:
       REL_OP(>);
       break;
