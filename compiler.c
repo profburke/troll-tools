@@ -27,7 +27,7 @@ static void pair(void);
 static void pairSelector(void);
 static void collection(void);
 static void ll(void); // find a better name
-static void various(void);
+static void variable(void);
 
 typedef struct {
   Token current;
@@ -439,7 +439,7 @@ ParseRule rules[] = {
   [TOKEN_UNTIL]         = {NULL, NULL, PREC_NONE},
   [TOKEN_FOREACH]       = {NULL, NULL, PREC_NONE},
   [TOKEN_DO]            = {NULL, NULL, PREC_NONE},
-  [TOKEN_IF]            = {NULL, NULL, PREC_NONE},
+  [TOKEN_IF]            = {ifexpression, NULL, PREC_NONE},
   [TOKEN_THEN]          = {NULL, NULL, PREC_NONE},
   [TOKEN_ELSE]          = {NULL, NULL, PREC_NONE},
   [TOKEN_MIN]           = {unary, NULL, PREC_NONE},
