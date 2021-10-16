@@ -28,6 +28,9 @@ static void pairSelector(void);
 static void collection(void);
 static void ll(void); // find a better name
 static void variable(void);
+static void ifexpression(void);
+static int emitJump(uint8_t instruction);
+static void patchJump(int offset);
 
 typedef struct {
   Token current;
@@ -165,6 +168,24 @@ static void emitReturn() {
   emitByte(OP_RETURN);
 }
 
+static int emitJump(uint8_t instruction) {
+  emitByte(instruction);
+  emitByte(0xff);
+  emitByte(0xff);
+  return currentChunk()->count - 2;
+}
+
+static void patchJump(int offset) {
+  int jump = currentChunk()->count - offset - 2;
+
+  if (jump > UINT16_MAX) {
+    error("Too much code to jump over.");
+  }
+
+  currentChunk()->code[offset] = (jump >> 8) & 0xff;
+  currentChunk()->code[offset + 1] = jump & 0xff;
+}
+
 static void integer() {
   int value = atoi(parser.previous.start);
   emitConstant(INTEGER_VAL(value));
@@ -223,6 +244,21 @@ static void variable() {
     // we're referencing an existing variable
     emitBytes(OP_GET_GLOBAL, global);
   }
+}
+
+static void ifexpression() {
+  expression();
+  int thenJump = emitJump(OP_JUMP_IF_EMPTY);
+  
+  consume(TOKEN_THEN, "Control expression for 'if' must be followed by 'then'.");
+  expression();
+  
+
+  int elseJump = emitJump(OP_JUMP);
+  patchJump(thenJump);
+  consume(TOKEN_ELSE, "True branch for 'if' expression must be follwed by 'else'.");
+  expression();
+  patchJump(elseJump);
 }
 
 static void unary() {

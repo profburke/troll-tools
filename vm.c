@@ -173,6 +173,28 @@ static InterpretResult run() {
     case OP_HCONC:
       BINARY_STRING_OP("h");
       break;
+    case OP_JUMP: {
+      uint16_t offset = READ_SHORT();
+      vm.ip += offset;
+      break;
+    }
+    case OP_JUMP_IF_EMPTY: {
+      bool doJump = false;
+      if (IS_INTEGER(peek(0))) {
+        pop(); // any integer is a non-empty collection, so not jumping
+      } else if (IS_COLLECTION(peek(0))) {
+        ObjCollection* c = AS_COLLECTION(pop());
+        doJump = (c->count == 0);
+      } else {
+        runtimeError("If expression must return a collection (or single integer).");
+        return INTERPRET_RUNTIME_ERROR;
+      }
+      uint16_t offset = READ_SHORT();
+      if (doJump) {
+        vm.ip += offset;
+      }
+      break;
+    }
     case OP_KEEP: {
       CHECK_COLLECTION(0, "Operands to drop must be collections.");
       CHECK_COLLECTION(1, "Operands to drop must be collections.");

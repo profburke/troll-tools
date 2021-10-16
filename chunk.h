@@ -22,6 +22,8 @@ typedef enum {
   OP_GET_GLOBAL,
   OP_GT,
   OP_HCONC,
+  OP_JUMP,
+  OP_JUMP_IF_EMPTY,
   OP_KEEP,
   OP_LARGEST,
   OP_LE,
