@@ -102,7 +102,7 @@ int disassembleInstruction(Chunk* chunk, int offset) {
   case OP_MDIE:
     return simpleInstruction("OP_MDIE", offset);
   case OP_MEDIAN:
-    return simpleInstruction("OP_MDIE", offset);
+    return simpleInstruction("OP_MEDIAN", offset);
   case OP_MIN:
     return simpleInstruction("OP_MIN", offset);
   case OP_MINIMAL:

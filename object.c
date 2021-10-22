@@ -45,7 +45,7 @@ static ObjString* allocateString(char* chars, int length, uint32_t hash) {
 }
 
 ObjCollection* copyCollection(const ObjCollection* c) {
-  ObjCollection* r = makeCollection();
+  ObjCollection* r = initCollection();
   r->capacity = c->capacity;
   r->count = c->count;
   size_t size = c->capacity * sizeof(int);
@@ -75,7 +75,7 @@ int findFirstIndex(const ObjCollection* c, int element) {
   return -1;
 }
 
-ObjCollection* makeCollection() {
+ObjCollection* initCollection() {
   ObjCollection* c = ALLOCATE_OBJ(ObjCollection, OBJ_COLLECTION);
   c->capacity = 0;
   c->count = 0;
@@ -83,7 +83,7 @@ ObjCollection* makeCollection() {
   return c;
 }
 
-ObjPair* makePair(Value a, Value b) {
+ObjPair* initPair(Value a, Value b) {
   ObjPair* pair = ALLOCATE_OBJ(ObjPair, OBJ_PAIR);
   pair->a = a;
   pair->b = b;

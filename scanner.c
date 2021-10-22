@@ -71,7 +71,7 @@ Token scanToken(void) {
     if (match('=')) {
       return makeToken(TOKEN_ASSIGN);
     } else {
-      return errorToken("TODO");
+      return errorToken("':' must be followed by '='.");
     }
   case '-':
     return makeToken(match('-') ? TOKEN_SET_MINUS : TOKEN_MINUS);
@@ -93,7 +93,7 @@ Token scanToken(void) {
     } else if (match('>')) {
       return makeToken(TOKEN_VCONCL);
     } else {
-      return errorToken("TODO");
+      return errorToken("'|' must be followed by either '|' or '>'.");
     }
   case '%':
     if (match('1')) {
@@ -101,7 +101,7 @@ Token scanToken(void) {
     } else if (match('2')) {
       return makeToken(TOKEN_SECOND);
     } else {
-      return errorToken("TODO");
+      return errorToken("'%' must be followed by either '1' or '2'.");
     }
   case '=':
     if (match('/') && match('=')) {
@@ -113,7 +113,7 @@ Token scanToken(void) {
     if (match('.')) {
       return makeToken(TOKEN_DOT_DOT);
     } else {
-      return errorToken("TODO");
+      return errorToken("'.' must be followed by a second '.'.");
     }
 
   case '"': return string();
@@ -128,7 +128,7 @@ static Token string() {
   }
 
   if (isAtEnd() || peek() == '\n') {
-    return errorToken("TODO");
+    return errorToken("Unexpected character.");
   }
 
   advance(); // past the closing "

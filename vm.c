@@ -87,7 +87,7 @@ static InterpretResult run() {
       ObjCollection* c = AS_COLLECTION(pop());
       ObjCollection* d = AS_COLLECTION(pop());
       if (c->count == 0) {
-        push(OBJ_VAL(makeCollection()));
+        push(OBJ_VAL(initCollection()));
       } else {
         push(OBJ_VAL(d));
       }
@@ -124,7 +124,16 @@ static InterpretResult run() {
       break;
     }
     case OP_DIFFERENT: {
-      // TODO: make me
+      CHECK_COLLECTION(0, "Operand to 'different' must be a collection.");
+      ObjCollection* c = AS_COLLECTION(pop());
+      ObjCollection* r = initCollection();
+      for (int i = 0; i < c->count; i++) {
+        int d = c->ints[i];
+        if (!member(r, d)) {
+          addToCollection(r, d);
+        }
+      }
+      push(OBJ_VAL(r));
       break;
     }
     case OP_DIVIDE:
@@ -135,7 +144,7 @@ static InterpretResult run() {
       CHECK_COLLECTION(1, "Operands to drop must be collections.");
       ObjCollection* d = AS_COLLECTION(pop());
       ObjCollection* c = AS_COLLECTION(pop());
-      ObjCollection* r = makeCollection();
+      ObjCollection* r = initCollection();
       for (int i = 0; i < c->count; i++) {
         int item = c->ints[i];
         if (!member(d, item)) {
@@ -200,7 +209,7 @@ static InterpretResult run() {
       CHECK_COLLECTION(1, "Operands to drop must be collections.");
       ObjCollection* d = AS_COLLECTION(pop());
       ObjCollection* c = AS_COLLECTION(pop());
-      ObjCollection* r = makeCollection();
+      ObjCollection* r = initCollection();
       for (int i = 0; i < c->count; i++) {
         int item = c->ints[i];
         if (member(d, item)) {
@@ -217,7 +226,7 @@ static InterpretResult run() {
       int n = AS_INTEGER(pop());
       reverseSortCollection(c);
       int upper = (int)fmin(c->count, n);
-      ObjCollection* r = makeCollection();
+      ObjCollection* r = initCollection();
       for (int i = 0; i < upper; i++) {
         addToCollection(r, c->ints[i]);
       }
@@ -234,7 +243,7 @@ static InterpretResult run() {
       int n = AS_INTEGER(pop());
       sortCollection(c);
       int upper = (int)fmin(c->count, n);
-      ObjCollection* r = makeCollection();
+      ObjCollection* r = initCollection();
       for (int i = 0; i < upper; i++) {
         addToCollection(r, c->ints[i]);
       }
@@ -245,9 +254,12 @@ static InterpretResult run() {
       REL_OP(<);
       break;
     case OP_MAX: {
-      // TODO: only take max on non-empty collection?
-      CHECK_COLLECTION(0, "Operand to 'max' must be a collection.");
+      CHECK_COLLECTION(0, "Operand to 'max' must be a non-empty collection.");
       ObjCollection* c = AS_COLLECTION(pop());
+      if (c->count == 0) {
+        runtimeError("Can only compute max of a non-empty collection.");
+        return INTERPRET_RUNTIME_ERROR;
+      }
       int max = INT32_MIN;
       for (int i = 0; i < c->count; i++) {
         if (c->ints[i] > max) {
@@ -266,7 +278,7 @@ static InterpretResult run() {
           max = c->ints[i];
         }
       }
-      ObjCollection* r = makeCollection();
+      ObjCollection* r = initCollection();
       for (int i = 0; i < c->count; i++) {
         if (c->ints[i] == max) {
           addToCollection(r, c->ints[i]);
@@ -280,7 +292,7 @@ static InterpretResult run() {
       CHECK_POSITIVE_INTEGER(1, "Expression for number of die must be a positive integer.");
       int sides = AS_INTEGER(pop());
       int ndice = AS_INTEGER(pop());
-      ObjCollection* c = makeCollection();
+      ObjCollection* c = initCollection();
       push(OBJ_VAL(c));
       for (int i = 0; i < ndice; i++) {
         int r = randomi(sides) + 1;
@@ -289,13 +301,24 @@ static InterpretResult run() {
       break;
     }
     case  OP_MEDIAN: {
-      // TODO: make me
+      CHECK_COLLECTION(0, "Operand for 'median' must be a non-empty collection.");
+      ObjCollection* c = AS_COLLECTION(pop());
+      if (c->count == 0) {
+        runtimeError("Can only compute median of a non-empty collection.");
+        return INTERPRET_RUNTIME_ERROR;
+      }
+      int i = (c->count)/2;
+      sortCollection(c);
+      push(INTEGER_VAL(c->ints[i]));
       break;
     }
     case OP_MIN: {
-      // TODO: only take max on non-empty collection?
-      CHECK_COLLECTION(0, "Operand to 'max' must be a collection.");
+      CHECK_COLLECTION(0, "Operand to 'min' must be a non-empty collection.");
       ObjCollection* c = AS_COLLECTION(pop());
+      if (c->count == 0) {
+        runtimeError("Can only compute min of a non-empty collection.");
+        return INTERPRET_RUNTIME_ERROR;
+      }
       int min = INT32_MAX;
       for (int i = 0; i < c->count; i++) {
         if (c->ints[i] < min) {
@@ -314,7 +337,7 @@ static InterpretResult run() {
           min = c->ints[i];
         }
       }
-      ObjCollection* r = makeCollection();
+      ObjCollection* r = initCollection();
       for (int i = 0; i < c->count; i++) {
         if (c->ints[i] == min) {
           addToCollection(r, c->ints[i]);
@@ -328,7 +351,7 @@ static InterpretResult run() {
       CHECK_POSITIVE_INTEGER(1, "Expression for number of die must be a positive integer.");
       int sides = AS_INTEGER(pop());
       int ndice = AS_INTEGER(pop());
-      ObjCollection* c = makeCollection();
+      ObjCollection* c = initCollection();
       push(OBJ_VAL(c));
       for (int i = 0; i < ndice; i++) {
         int r = randomi(sides + 1);
@@ -337,14 +360,14 @@ static InterpretResult run() {
       break;
     }
     case OP_MKCOLLECTION: {
-      ObjCollection* c = makeCollection();
+      ObjCollection* c = initCollection();
       push(OBJ_VAL(c));
       break;
     }
     case OP_MKPAIR: {
       Value b = pop();
       Value a = pop();
-      ObjPair* p = makePair(a, b);
+      ObjPair* p = initPair(a, b);
       push(OBJ_VAL(p));
       break;
     }
@@ -368,21 +391,24 @@ static InterpretResult run() {
       if (c->count == 0) {
         push(INTEGER_VAL(1));
       } else {
-        push(OBJ_VAL(makeCollection()));
+        push(OBJ_VAL(initCollection()));
       }
       break;
     }
     case OP_PICK: {
       CHECK_INTEGER(0, "Right operand to 'pick' must be a positive integer.");
-      // TODO: check right operand is > 0
       CHECK_COLLECTION(1, "Left operand to 'pick' must be a collection.");
       int n = AS_INTEGER(pop());
+      if (n < 1) {
+        runtimeError("Right operand to 'pick' must be a positive integer.");
+        return INTERPRET_RUNTIME_ERROR;
+      }
       ObjCollection* c = AS_COLLECTION(pop());
       ObjCollection* candidates = copyCollection(c);
       if (n >= candidates->count) {
         push(OBJ_VAL(candidates));
       } else {
-        ObjCollection* r = makeCollection();
+        ObjCollection* r = initCollection();
         for (int i = 0; i < n; i ++) {
           int index = randomi(candidates->count);
           addToCollection(r, candidates->ints[index]);
@@ -399,7 +425,7 @@ static InterpretResult run() {
       if (v < p) {
         push(INTEGER_VAL(1));
       } else {
-        ObjCollection* c = makeCollection();
+        ObjCollection* c = initCollection();
         push(OBJ_VAL(c));
       }
       break;
@@ -409,7 +435,7 @@ static InterpretResult run() {
       CHECK_INTEGER(1, "Operands to range must be integers.");
       int r = AS_INTEGER(pop());
       int l = AS_INTEGER(pop());
-      ObjCollection* c = makeCollection();
+      ObjCollection* c = initCollection();
       for (int i = l; i < r; i++) {
         addToCollection(c, i);
       }
@@ -473,7 +499,7 @@ static InterpretResult run() {
       CHECK_COLLECTION(1, "Union operands must be collections.");
       ObjCollection *d = AS_COLLECTION(pop());
       ObjCollection *c = AS_COLLECTION(pop());
-      ObjCollection *u = makeCollection();
+      ObjCollection *u = initCollection();
       for (int i = 0; i < c->count; i++) {
         addToCollection(u, c->ints[i]);
       }

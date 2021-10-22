@@ -26,7 +26,7 @@ static void string(void);
 static void pair(void);
 static void pairSelector(void);
 static void collection(void);
-static void ll(void); // find a better name
+static void ll(void); // FIXME: find a better name
 static void variable(void);
 static void ifexpression(void);
 static int emitJump(uint8_t instruction);
@@ -264,7 +264,7 @@ static void ifexpression() {
 static void unary() {
   TokenType operatorType = parser.previous.type;
 
-  // TODO: this won't work if we use this function for various
+  // FIXME: this won't work if we use this function for various
   // unary ops since they don't all have the same precedence...
   // how best to handle this?
   parsePrecedence(PREC_UNARY_MINUS);
@@ -289,7 +289,7 @@ static void unary() {
 static void dieroll() {
     TokenType operatorType = parser.previous.type;
 
-    // TODO: correct precedence?
+    // FIXME: correct precedence?
     parsePrecedence(PREC_DIE);
 
     switch (operatorType) {
@@ -382,7 +382,7 @@ static void pair() {
 static void pairSelector() {
   TokenType operatorType = parser.previous.type;
 
-  parsePrecedence(PREC_AGGREGATE); // TODO: I don't think this is correct
+  parsePrecedence(PREC_AGGREGATE); // FIXME: I don't think this is correct
 
   switch (operatorType) {
   case TOKEN_FIRST: emitByte(OP_FIRST); break;
@@ -434,7 +434,7 @@ ParseRule rules[] = {
   [TOKEN_BANG]          = {NULL, unary, PREC_NONE},
   [TOKEN_AND]           = {NULL, binary, PREC_UNION},
   [TOKEN_HASH]          = {NULL, NULL, PREC_NONE},
-  [TOKEN_QUESTION]      = {question, NULL, PREC_NONE}, // TODO: we don't really need precedence, do we?
+  [TOKEN_QUESTION]      = {question, NULL, PREC_NONE}, // FIXME: we don't really need precedence, do we?
   [TOKEN_SAMPLE]        = {NULL, NULL, PREC_NONE},
   [TOKEN_LBRACK]        = {pair, NULL, PREC_NONE},
   [TOKEN_RBRACK]        = {NULL, NULL, PREC_NONE},
@@ -483,7 +483,7 @@ ParseRule rules[] = {
   [TOKEN_MINIMAL]       = {unary, NULL, PREC_NONE},
   [TOKEN_MAXIMAL]       = {unary, NULL, PREC_NONE},
   [TOKEN_CHOOSE]        = {unary, NULL, PREC_NONE},
-  [TOKEN_DIFFERENT]     = {NULL, NULL, PREC_NONE},
+  [TOKEN_DIFFERENT]     = {unary, NULL, PREC_NONE},
   [TOKEN_FUNCTION]      = {NULL, NULL, PREC_NONE},
   [TOKEN_CALL]          = {NULL, NULL, PREC_NONE},
   [TOKEN_COMPOSITIONAL] = {NULL, NULL, PREC_NONE},

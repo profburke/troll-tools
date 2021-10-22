@@ -7,7 +7,7 @@
     CHECK_INTEGER(1, "Filter value must be an integer.");       \
     ObjCollection* c = AS_COLLECTION(pop());                    \
     int f = AS_INTEGER(pop());                                  \
-    ObjCollection* r = makeCollection();                        \
+    ObjCollection* r = initCollection();                        \
     for (int i = 0; i < c->count; i++) {                        \
       if (f op c->ints[i]) {                                    \
         addToCollection(r, c->ints[i]);                         \
